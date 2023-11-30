@@ -97,6 +97,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
       _id: user._id,
       email: user.email,
       username: user.username,
+      avatar: user.avatar,
+      quizzesTaken: user.quizzesTaken,
+      highScore: user.highScore,
     });
   } else {
     res.status(404);
@@ -114,7 +117,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   if (user) {
     res.status(200).json({
-      message: 'User Deleted',
+      message: 'User deleted',
     });
   } else {
     res.status(404);
@@ -133,22 +136,54 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.email = req.body.email || user.email;
     user.username = req.body.username || user.username;
+    user.avatar = req.body.avatar || user.avatar;
+    user.quizzesTaken = req.body.quizzesTaken || user.quizzesTaken;
 
     if (req.body.password) {
       user.password = req.body.password;
     }
 
-    const updatedUser = await user.save();
+    if (req.body.highScore && req.body.highScore > user.highScore) {
+      user.highScore = req.body.highScore;
+    }
+
+    await user.save();
 
     res.json({
-      _id: updatedUser._id,
-      email: updatedUser.email,
-      username: updatedUser.username,
+      message: 'User Profile updated',
     });
   } else {
     res.status(404);
     throw new Error('User not found');
   }
+});
+
+/**
+ * @desc get user's quizzes
+ * @route GET /api/users/quizzes
+ * @access private
+ */
+const getUserQuizzes = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id)
+    .populate({
+      path: 'quizzes',
+      select: '_id',
+    })
+    .exec();
+
+  if (!user) {
+    res.status(400);
+    throw new Error('User not found');
+  }
+
+  if (!user.populated('quizzes')) {
+    res.status(400);
+    throw new Error('Could not populate created quizzes');
+  }
+
+  const flattenedQuizzes = user.quizzes.map((quiz) => quiz._id);
+
+  res.status(200).json(flattenedQuizzes);
 });
 
 export {
@@ -158,4 +193,5 @@ export {
   deleteUser,
   getUserProfile,
   updateUserProfile,
+  getUserQuizzes,
 };

@@ -5,13 +5,9 @@ import {
   logoutUser,
   deleteUser,
   getUserProfile,
+  getUserQuizzes,
   updateUserProfile,
 } from '../controllers/userController.js';
-import {
-  getQuizzes,
-  removeFromQuizzes,
-  updateQuiz,
-} from '../controllers/userQuizzesController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -25,10 +21,6 @@ router
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 
-router.get('/quizzes', protect, getQuizzes);
-router
-  .route('/quizzes/:id')
-  .delete(protect, removeFromQuizzes)
-  .put(protect, updateQuiz);
+router.get('/quizzes', protect, getUserQuizzes);
 
 export default router;
