@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Quiz from '../models/quizModel.js';
+import User from '../models/userModel.js';
 
 /**
  * @desc get public quizzes
@@ -43,6 +44,7 @@ const addQuiz = asyncHandler(async (req, res) => {
   const { title, description, tags, isPublic, questions } = req.body;
 
   const quiz = await Quiz.create({
+    creator: req.user._id,
     title,
     description,
     tags,
@@ -53,6 +55,15 @@ const addQuiz = asyncHandler(async (req, res) => {
   if (!quiz) {
     res.status(400);
     throw new Error('Could not create quiz');
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $push: { quizzes: quiz._id },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error('Could not update user');
   }
 
   res.json({
@@ -72,6 +83,15 @@ const removeQuiz = asyncHandler(async (req, res) => {
   }
 
   await Quiz.findByIdAndDelete(req.params.id);
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $pull: { quizzes: req.params.id },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error('Could not update user');
+  }
 
   res.json({
     message: 'Quiz deleted',
@@ -100,7 +120,6 @@ const updateQuiz = asyncHandler(async (req, res) => {
     quiz.tags = tags || quiz.tags;
     quiz.questions = questions || quiz.questions;
 
-    let publicationChange = false;
     if (isPublic !== undefined && isPublic !== quiz.isPublic) {
       quiz.isPublic = isPublic;
       publicationChange = true;

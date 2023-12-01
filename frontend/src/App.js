@@ -11,16 +11,18 @@ import Header from './components/Header';
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import MyAccount from './pages/MyAccount';
 
 function App() {
   return (
-    <>
+    <div className="relative overflow-hidden">
       <Header />
       <Route path="/" component={Main} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/my-account" component={MyAccount} />
       <ToastContainer theme="dark" />
-    </>
+    </div>
   );
 }
 

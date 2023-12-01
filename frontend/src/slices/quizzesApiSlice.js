@@ -38,7 +38,7 @@ export const quizzesApiSlice = apiSlice.injectEndpoints({
         url: `${QUIZZES_URL}/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'Quiz', id }],
+      invalidatesTags: ['Quiz'],
     }),
     updateQuiz: builder.mutation({
       query: (data) => ({
