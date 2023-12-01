@@ -1,7 +1,7 @@
 import { apiSlice } from '../apiSlice';
 const USERS_URL = '/api/users';
 
-export const userApiSlice = apiSlice.injectEndpoints({
+export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (data) => ({
@@ -23,17 +23,33 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    deleteUser: builder.mutation({
+    getUser: builder.query({
       query: () => ({
-        url: `${USERS_URL}`,
-        method: 'DELETE',
+        url: `${USERS_URL}/profile`,
+        method: 'GET',
       }),
+      providesTags: ['User'],
+    }),
+    getUserQuizzes: builder.query({
+      // gets an array of quiz ids owned by the user
+      query: () => ({
+        url: `${USERS_URL}/quizzes`,
+        method: 'GET',
+      }),
+      providesTags: [{ type: 'Quiz', id: 'USER' }],
     }),
     updateUser: builder.mutation({
       query: (data) => ({
         url: `${USERS_URL}/profile`,
         method: 'PUT',
         body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    deleteUser: builder.mutation({
+      query: () => ({
+        url: `${USERS_URL}`,
+        method: 'DELETE',
       }),
     }),
   }),
@@ -43,6 +59,8 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,
-  useDeleteUserMutation,
+  useGetUserQuery,
+  useGetUserQuizzesQuery,
   useUpdateUserMutation,
-} = userApiSlice;
+  useDeleteUserMutation,
+} = usersApiSlice;

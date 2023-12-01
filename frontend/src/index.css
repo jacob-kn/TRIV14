@@ -7,7 +7,6 @@ body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   background: linear-gradient(180deg, #08081f 0%, #161b22 100%);
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

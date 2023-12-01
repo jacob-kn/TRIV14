@@ -18,7 +18,7 @@ function Main() {
   return (
     <>
       <BgFlourish flourish="1" />
-      <div className="flex gap-16 items-center justify-center px-12">
+      <div className="flex gap-16 items-center justify-center px-12 pb-24">
         <div className="relative w-2/3 max-w-3xl">
           <img
             src={process.env.PUBLIC_URL + '/flourishes/join-polygons.svg'}

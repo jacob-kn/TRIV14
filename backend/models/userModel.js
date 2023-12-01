@@ -34,6 +34,11 @@ const userSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
+    avatar: {
+      type: Number,
+      required: false,
+      default: Math.floor(Math.random() * 30) + 1,
+    },
   },
   {
     timestamps: true,
