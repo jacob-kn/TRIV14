@@ -12,6 +12,8 @@ import Main from './pages/Main';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
+import Overview from './pages/Overview';
+
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/my-account" component={MyAccount} />
+      <Route path="/quizzes/:quizId/overview" component={Overview} />
       <ToastContainer theme="dark" />
     </div>
   );

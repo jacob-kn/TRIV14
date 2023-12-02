@@ -90,7 +90,14 @@ function MyAccount() {
         ) : (
           <div className="flex flex-wrap justify-center gap-8">
             {quizzes.map((quizId) => (
-              <QuizCard quizId={quizId} isOwned />
+              <div>
+                <QuizCard quizId={quizId} isOwned />
+                <Link to={`/quizzes/${quizId}/overview`}>
+                  <Button className="w-full my-4">
+                    View this quiz
+                  </Button>
+                </Link>
+              </div>
             ))}
           </div>
         )}
