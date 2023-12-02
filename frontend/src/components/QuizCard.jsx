@@ -15,7 +15,7 @@ import IconButton from './IconButton';
 import DeleteButton from './DeleteButton';
 
 const QuizCard = ({ quizId, isOwned }) => {
-  const { data: quiz, isLoading } = useGetQuizQuery(quizId);
+  const { data: quiz, isLoading, isFetching } = useGetQuizQuery(quizId);
   const [removeQuiz] = useRemoveQuizMutation();
   const [updateQuiz] = useUpdateQuizMutation();
 
@@ -49,22 +49,29 @@ const QuizCard = ({ quizId, isOwned }) => {
   };
 
   // Skeleton loading state
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
-      <div className="flex flex-col gap-6 items-center px-6 py-4 rounded-xl bg-gray-600 w-96">
-        <div className="w-1/2 h-6 rounded-md bg-gray-500 animate-pulse"></div>
-        <div className="w-3/4 h-4 rounded-md bg-gray-500 animate-pulse"></div>
+      <div className="flex flex-col gap-6 items-center px-6 p-6 rounded-xl bg-gray-700 w-96">
+        <div className="w-1/2 h-10 rounded-md bg-gray-600 animate-pulse"></div>
+        <div className="w-3/4 h-4 rounded-md bg-gray-600 animate-pulse"></div>
+        <div className="w-3/4 h-4 -mt-4 rounded-md bg-gray-600 animate-pulse"></div>
+        <div className="w-3/4 h-4 -mt-4 rounded-md bg-gray-600 animate-pulse"></div>
         <div className="flex justify-around gap-6 w-full">
-          <span className="w-1/3 h-4 rounded-full bg-gray-500 animate-pulse"></span>
-          <span className="w-1/3 h-4 rounded-md bg-gray-500 animate-pulse"></span>
+          <span className="w-1/3 h-4 rounded-full bg-gray-600 animate-pulse"></span>
+          <span className="w-1/3 h-4 rounded-md bg-gray-600 animate-pulse"></span>
         </div>
+        {isOwned && (
+          <div className="w-1/3 h-12 rounded-md bg-gray-600 animate-pulse"></div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-96">
-      <h3 className="text-2xl font-bold text-center">{quiz.title}</h3>
+      <h3 className="text-xl sm:text-2xl font-bold text-center w-full px-10 line-clamp-2">
+        {quiz.title}
+      </h3>
       <h3 className="flex-grow text-md text-center line-clamp-3">
         <span>{quiz.description}</span>
       </h3>

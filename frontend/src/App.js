@@ -15,7 +15,7 @@ import MyAccount from './pages/MyAccount';
 
 function App() {
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden min-h-screen">
       <Header />
       <Route path="/" component={Main} />
       <Route path="/login" component={Login} />
