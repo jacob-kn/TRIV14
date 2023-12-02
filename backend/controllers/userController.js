@@ -164,26 +164,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  * @access private
  */
 const getUserQuizzes = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id)
-    .populate({
-      path: 'quizzes',
-      select: '_id',
-    })
-    .exec();
+  const user = await User.findById(req.user.id);
 
   if (!user) {
     res.status(400);
     throw new Error('User not found');
   }
 
-  if (!user.populated('quizzes')) {
-    res.status(400);
-    throw new Error('Could not populate created quizzes');
-  }
-
-  const flattenedQuizzes = user.quizzes.map((quiz) => quiz._id);
-
-  res.status(200).json(flattenedQuizzes);
+  res.status(200).json(user.quizzes);
 });
 
 export {

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
+import { apiSlice } from '../slices/apiSlice';
 import { useLogoutMutation } from '../slices/auth/usersApiSlice';
 import { logout } from '../slices/auth/authSlice';
 import { Link, useLocation } from 'wouter';
 
 import Button from './Button';
 import IconButton from './IconButton';
-import Divider from './Divider';
 import {
   UserIcon,
   Bars3Icon,
@@ -26,6 +26,8 @@ function Header() {
     try {
       await logoutApiCall().unwrap();
       dispatch(logout());
+      // Clear the redux cache on logout to make way for a new user session
+      dispatch(apiSlice.util.resetApiState());
       navigate('/');
     } catch (err) {
       console.log(err);
@@ -34,14 +36,6 @@ function Header() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const onLogin = () => {
-    setIsMenuOpen(false);
-  };
-
-  const onRegister = () => {
-    setIsMenuOpen(false);
   };
 
   const handleClickOutside = (event) => {

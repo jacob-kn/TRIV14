@@ -82,7 +82,19 @@ const removeQuiz = asyncHandler(async (req, res) => {
     throw new Error('Quiz ID could not be found in request parameters');
   }
 
-  await Quiz.findByIdAndDelete(req.params.id);
+  const quiz = Quiz.findById(req.params.id);
+
+  if (!quiz) {
+    res.status(404);
+    throw new Error('Quiz not found');
+  }
+
+  if (quiz.creator !== req.user._id) {
+    res.status(401);
+    throw new Error('User not authorized to delete this quiz');
+  }
+
+  await quiz.remove();
 
   const user = await User.findByIdAndUpdate(req.user._id, {
     $pull: { quizzes: req.params.id },
@@ -113,20 +125,29 @@ const updateQuiz = asyncHandler(async (req, res) => {
 
   const quiz = await Quiz.findById(req.params.id);
 
-  let publicationChange = false;
-  if (quiz) {
-    quiz.title = title || quiz.title;
-    quiz.description = description || quiz.description;
-    quiz.tags = tags || quiz.tags;
-    quiz.questions = questions || quiz.questions;
-
-    if (isPublic !== undefined && isPublic !== quiz.isPublic) {
-      quiz.isPublic = isPublic;
-      publicationChange = true;
-    }
-
-    await quiz.save();
+  if (!quiz) {
+    res.status(404);
+    throw new Error('Quiz not found');
   }
+
+  if (quiz.creator !== req.user._id) {
+    res.status(401);
+    throw new Error('User not authorized to edit this quiz');
+  }
+
+  let publicationChange = false;
+
+  quiz.title = title || quiz.title;
+  quiz.description = description || quiz.description;
+  quiz.tags = tags || quiz.tags;
+  quiz.questions = questions || quiz.questions;
+
+  if (isPublic !== undefined && isPublic !== quiz.isPublic) {
+    quiz.isPublic = isPublic;
+    publicationChange = true;
+  }
+
+  await quiz.save();
 
   res.json({
     publicationChange,
