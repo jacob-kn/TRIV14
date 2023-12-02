@@ -28,7 +28,7 @@ function MyAccount() {
     <>
       <BgFlourish flourish="3" />
 
-      <div className="flex items-center justify-center gap-24 p-6">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-24 p-6">
         <div className="flex flex-col justify-self-end items-center gap-6">
           <div className="rounded-full p-6 bg-blue-violet/50 border-4 border-white/70">
             <img
@@ -66,16 +66,18 @@ function MyAccount() {
         </ul>
       </div>
 
-      <div className="relative my-8 mx-20">
-        <h1 className="text-white text-3xl font-bold text-center my-8">
-          My Quizzes
-        </h1>
-        <Link to="/quizzes/create">
-          <Button type="secondary" className="absolute top-0 right-0">
-            <PlusIcon className="w-6 h-6" />
-            Create quiz
-          </Button>
-        </Link>
+      <div className="mx-4 my-8 sm:mx-20">
+        <div className="flex flex-col items-center gap-4 my-8">
+          <h1 className="text-white text-3xl font-bold text-center">
+            My Quizzes
+          </h1>
+          <Link to="/quizzes/create">
+            <Button type="secondary">
+              <PlusIcon className="w-6 h-6" />
+              Create quiz
+            </Button>
+          </Link>
+        </div>
 
         {isLoadingQuizzes ? (
           <Spinner />
