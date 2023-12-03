@@ -13,7 +13,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
 import Overview from './pages/Overview';
-
+import Edit from './pages/Edit';
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
       <Route path="/register" component={Register} />
       <Route path="/my-account" component={MyAccount} />
       <Route path="/quizzes/:quizId/overview" component={Overview} />
+      <Route path="/quizzes/:quizId/edit" component={Edit} />
       <ToastContainer theme="dark" />
     </div>
   );

@@ -9,17 +9,16 @@ import BgFlourish from '../components/BgFlourish';
 function Overview() {
   const { quizId } = useParams(); // Extract the quizId from the URL parameters
   const { data: quiz, isLoading, isError } = useGetQuizQuery(quizId);
-    const myList = ['boobs', 'balls', 'caca', 'a','b'];
   if (isLoading) {
     return <Loader />;
   }
 
   if (isError) {
-    return <div>Error fetching quiz data</div>;
+    return <h1 className="text-white">Error fetching quiz data</h1>;
   }
 
   if (!quiz) {
-    return <div>No quiz data available</div>;
+    return <h1 className="text-white">No quiz data available</h1>;
   }
 
   return (
