@@ -160,10 +160,17 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
 /**
  * @desc get user's quizzes
- * @route GET /api/users/quizzes
+ * @route GET /api/users/quizzes?page
  * @access private
  */
 const getUserQuizzes = asyncHandler(async (req, res) => {
+  const page = req.query.page || 1;
+
+  if (page < 1) {
+    res.status(400);
+    throw new Error('Page number must be greater than 0');
+  }
+
   const user = await User.findById(req.user.id);
 
   if (!user) {
@@ -171,7 +178,18 @@ const getUserQuizzes = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
-  res.status(200).json(user.quizzes);
+  const pageSize = 12;
+  const startIndex = (page - 1) * pageSize;
+
+  const count = user.quizzes.length;
+  if (count !== 0 && startIndex >= count) {
+    res.status(400);
+    throw new Error(`Page number exceeds number of quizzes`);
+  }
+
+  const quizzes = user.quizzes.slice(startIndex, startIndex + pageSize);
+  const totalPages = Math.ceil(count / pageSize);
+  res.status(200).json({ quizzes, totalPages });
 });
 
 export {
