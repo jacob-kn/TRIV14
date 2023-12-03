@@ -18,6 +18,7 @@ const quizSchema = mongoose.Schema(
     tags: {
       type: [String],
       required: false,
+      default: ['Other'],
     },
     plays: {
       type: Number,
