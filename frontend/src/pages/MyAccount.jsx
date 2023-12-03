@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'wouter';
 import { toast } from 'react-toastify';
 import {
@@ -11,14 +12,48 @@ import Loader from '../components/Loader';
 import Spinner from '../components/Spinner';
 import BgFlourish from '../components/BgFlourish';
 import QuizCard from '../components/QuizCard';
-import { Cog6ToothIcon, PlusIcon } from '@heroicons/react/24/outline';
+import Pagination from '../components/Pagination';
+import {
+  Cog6ToothIcon,
+  ExclamationCircleIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
 
 function MyAccount() {
   const [location, navigate] = useLocation();
+  const { userInfo } = useSelector((state) => state.auth);
+  const [page, setPage] = useState(1);
 
-  const { data: user, isLoading } = useGetUserQuery();
-  const { data: quizzes, isLoading: isLoadingQuizzes } =
-    useGetUserQuizzesQuery();
+  const { data: user, isLoading, isError } = useGetUserQuery();
+  const {
+    data,
+    isLoading: isLoadingQuizzes,
+    isError: isErrorQuizzes,
+  } = useGetUserQuizzesQuery();
+
+  const quizzes = data?.quizzes;
+  const totalPages = data?.totalPages;
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate('/login');
+    }
+  }, [userInfo, navigate]);
+
+  if (isError) {
+    return (
+      <div className="flex justify-center mt-16">
+        <h2 className="flex flex-col items-center text-gray-200 text-2xl">
+          <ExclamationCircleIcon className="w-8 h-8" />
+          Could not load user
+        </h2>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <Loader />;
@@ -57,7 +92,13 @@ function MyAccount() {
           </li>
           <li className="flex justify-between gap-10">
             <span>Quizzes Created</span>
-            {isLoadingQuizzes ? <Spinner /> : <span>{quizzes.length}</span>}
+            {isLoadingQuizzes ? (
+              <Spinner />
+            ) : isErrorQuizzes ? (
+              <ExclamationCircleIcon className="w-6 h-6" />
+            ) : (
+              <span>{quizzes.length}</span>
+            )}
           </li>
           <li className="flex justify-between gap-10">
             <span>Highest Score</span>
@@ -77,23 +118,37 @@ function MyAccount() {
               Create quiz
             </Button>
           </Link>
-        </div>
 
-        {isLoadingQuizzes ? (
-          <Spinner />
-        ) : !quizzes.length ? (
-          <div className="flex justify-center">
-            <h3 className="text-gray-200">
-              You have not created any quizzes yet.
-            </h3>
-          </div>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-8">
-            {quizzes.map((quizId) => (
-              <QuizCard quizId={quizId} isOwned />
-            ))}
-          </div>
-        )}
+          {isLoadingQuizzes ? (
+            <Spinner />
+          ) : isErrorQuizzes ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200 flex gap-2">
+                <ExclamationCircleIcon className="w-6 h-6" />
+                Could not load quizzes. Please try again later.
+              </h3>
+            </div>
+          ) : !quizzes.length ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200">
+                You have not created any quizzes yet.
+              </h3>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-center gap-8">
+                {quizzes.map((quizId) => (
+                  <QuizCard quizId={quizId} isOwned />
+                ))}
+              </div>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={page}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+        </div>
       </div>
     </>
   );
