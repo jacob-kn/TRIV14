@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { socket } from './socket';
 import { Route } from 'wouter';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
