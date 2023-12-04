@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
+import Quiz from '../models/quizModel.js';
 import generateToken from '../utils/generateToken.js';
 
 /**
@@ -116,8 +117,11 @@ const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndDelete(req.user._id);
 
   if (user) {
+    // Delete all quizzes made by the user
+    await Quiz.deleteMany({ creator: req.user._id });
+
     res.status(200).json({
-      message: 'User deleted',
+      message: 'User and associated quizzes deleted',
     });
   } else {
     res.status(404);
@@ -132,6 +136,15 @@ const deleteUser = asyncHandler(async (req, res) => {
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
+
+  if (req.body.email) {
+    // check to see if email already exists in the user database
+    const emailExists = await User.findOne({ email: req.body.email });
+    if (emailExists) {
+      res.status(400);
+      throw new Error('A user with that email already exists');
+    }
+  }
 
   if (user) {
     user.email = req.body.email || user.email;
