@@ -165,7 +165,7 @@ function Quizzes() {
           <>
             <div className="flex flex-wrap justify-center gap-8 max-w-[1500px]">
               {quizzes.map((quizId) => (
-                <QuizCard quizId={quizId} />
+                <QuizCard key={quizId} quizId={quizId} />
               ))}
             </div>
 

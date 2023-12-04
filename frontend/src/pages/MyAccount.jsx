@@ -139,7 +139,7 @@ function MyAccount() {
           <>
             <div className="flex flex-wrap justify-center gap-8">
               {quizzes.map((quizId) => (
-                <QuizCard quizId={quizId} isOwned />
+                <QuizCard key={quizId} quizId={quizId} isOwned />
               ))}
             </div>
             <Pagination
