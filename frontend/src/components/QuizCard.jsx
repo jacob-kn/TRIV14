@@ -96,8 +96,11 @@ const QuizCard = ({ quizId, isOwned }) => {
       <div className="flex-grow flex justify-around items-end gap-6">
         {quiz.tags && (
           <div className="flex flex-wrap justify-center gap-2">
-            {quiz.tags.map((tag) => (
-              <span className="px-4 py-1 rounded-full bg-blue-violet">
+            {quiz.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="px-4 py-1 rounded-full bg-blue-violet"
+              >
                 {tag}
               </span>
             ))}
