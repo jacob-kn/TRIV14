@@ -1,3 +1,5 @@
+const { handleAnswer , startQuiz, handleNextQuestion } = require('../utils/quizLogic'); 
+
 const setupWebSocket = (io) => {
     io.on('connection', (socket) => {
         console.log('A user connected: ', socket.id); // Just for Testing
@@ -31,14 +33,22 @@ const setupWebSocket = (io) => {
         socket.on('createQuiz', (roomCode) => {
             socket.join(roomCode); // Having the host join the room, ends up creating the room
         })
-        socket.on('startQuiz', ({roomCode, quizID}) => {
-            // Since quiz got started, we have to notify all the clients (in the respective namespace)
-            io.to(roomCode).emit('quizStarted', {roomCode, quizID});
+
+        socket.on('startQuiz', ({ quiz, roomCode, duration}) => { // quiz is literally the json object
+            startQuiz(io, quiz, roomCode, duration, socket.id);
         })
+
         socket.on('endQuiz', ({roomCode, quizID}) => {
             // Since quiz ended, we have to notify all the clients (in the respective namespace)
             io.to(roomCode).emit('quizEnded', {roomCode, quizID});
             io.to(roomCode).socketsLeave(roomCode);
+        })
+
+        socket.on('submitAnswer', ({selectedAnswer, roomCode}) => {
+            handleAnswer(io, socket.id, selectedAnswer, roomCode);
+        })
+        socket.on('nextQuestion', (roomCode) => {
+            handleNextQuestion(socket.id, roomCode);
         })
     });
 };

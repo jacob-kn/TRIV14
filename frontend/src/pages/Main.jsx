@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import socket from '../socket/socket';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'wouter';
 import Input from '../components/Input';
