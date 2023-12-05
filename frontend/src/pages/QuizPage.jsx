@@ -1,3 +1,5 @@
+import BgFlourish from "../components/BgFlourish";
+import CountdownBar from "../components/CountDownTimer";
 import { useEffect, useState } from "react";
 import MultipleChoice from "../components/MultipleChoice";
 import FillInTheBlanks from "../components/FillInTheBlanks";
@@ -11,6 +13,8 @@ import { useGetUserQuery } from "../slices/auth/usersApiSlice";
 export default function QuizPage() {
   const { roomCode } = useParams();
   const [currentQuestion, setCurrentQuestion] = useState();
+  const [isClickable, setIsClickable] = useState(true);
+  const [answer, setAnswer] = useState("");
 
   const quizIds = [
     "65691706b7ef6d91783b40b3",
@@ -33,7 +37,7 @@ export default function QuizPage() {
   let isComplete = false;
 
   // time remaining
-  let timeRemaining = 60;
+  const timeRemaining = 10;
 
   // score
   let score = 1234;
@@ -154,9 +158,20 @@ export default function QuizPage() {
     "Zane",
   ]);
 
-  const submitAnswer = (ans) => {
-    console.log("Submitting: " + ans);
+  const handleCountdownEnd = () => {
+    setIsClickable(false);
+    
+    console.log("Time is up!");
   };
+
+  const handleUserInput = (ans) => {
+    setAnswer(ans);
+    console.log("User's Input: " + ans);
+  }
+
+  useEffect(() => {
+    console.log("Submitting: " + answer);
+  }, [isClickable])
 
   if (isLoading) {
     return <Spinner />;
@@ -165,10 +180,10 @@ export default function QuizPage() {
   if (isLoadingUser) {
     return <Spinner />;
   } else {
-    console.log(user.username);
+    // console.log(user.username);
   }
 
-  console.log(quiz);
+  // console.log(quiz);
 
   if (!isStarted) {
     return (
@@ -188,29 +203,48 @@ export default function QuizPage() {
 
   return (
     <>
-      {quiz ? (
-        <>
-          {quiz.questions[questionIndex].type === "Multiple Choice" ? (
-            <MultipleChoice
-              title={quiz.title}
-              question={quiz.questions[questionIndex].question}
-              options={quiz.questions[questionIndex].options}
-              score={score}
-              submit={submitAnswer}
-            />
+      <div className="min-h-fit pb-16 mb-8">
+        <BgFlourish flourish="3" />
+        <div className="flex flex-col gap-4 items-center justify-center">
+          <div className="flex flex-row items-center ">
+            <div className="md:hidden flex flex-col items-center justify-center bg-surface w-fit rounded-lg">
+              <h2 className="text-white p-2 font-bold md:text-xl">Score</h2>
+              <p className="text-white p-2 md:text-xl text-center">{score}</p>
+            </div>
+            <h1 className="text-white text-2xl font-bold px-4">{quiz.title}</h1>
+          </div>
+          <CountdownBar
+            totalSeconds={timeRemaining}
+            onCountdownEnd={handleCountdownEnd}
+          />
+          <div>
+            <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">
+              {quiz.questions[questionIndex].question}
+            </h1>
+          </div>
+
+          {quiz ? (
+            <>
+              {quiz.questions[questionIndex].type === "Multiple Choice" ? (
+                <MultipleChoice
+                  options={quiz.questions[questionIndex].options}
+                  score={score}
+                  userInput={handleUserInput}
+                  isClickable={isClickable}
+                />
+              ) : (
+                <FillInTheBlanks
+                  options={quiz.questions[questionIndex].options}
+                  score={score}
+                  userInput={handleUserInput}
+                />
+              )}
+            </>
           ) : (
-            <FillInTheBlanks
-              title={quiz.title}
-              question={quiz.questions[questionIndex].question}
-              options={quiz.questions[questionIndex].options}
-              score={score}
-              submit={submitAnswer}
-            />
+            <Spinner />
           )}
-        </>
-      ) : (
-        <Spinner />
-      )}
+        </div>
+      </div>
     </>
   );
 }
