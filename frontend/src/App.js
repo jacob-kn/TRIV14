@@ -13,10 +13,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
 import EnterQuiz from './pages/EnterQuiz';
-import Lobby from './pages/Lobby';
 import HostLobby from './pages/HostLobby';
-import WinnerPage from './pages/WinnerPage';
 import QuizPage from "./pages/QuizPage";
+import HostPage from "./pages/HostPage";
 
 function App() {
   return (
@@ -27,14 +26,11 @@ function App() {
       <Route path="/register" component={Register} />
       <Route path="/my-account" component={MyAccount} />
 
-      <Route path="/host/:roomCode" component={<></>} />
-      <Route path="/play/:roomCode" component={<></>} />
+      <Route path="/host/:roomCode" component={HostPage} />
+      <Route path="/play/:roomCode" component={QuizPage} />
 
-      <Route path="/quiz-page" component={QuizPage} />
       <Route path="/enter-quiz" component={EnterQuiz} />
-      <Route path="/lobby" component={Lobby} />
       <Route path="/host-lobby" component={HostLobby} />
-      <Route path="/winner-page" component={WinnerPage} />
       
       <ToastContainer theme="dark" />
     </div>

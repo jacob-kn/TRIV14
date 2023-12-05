@@ -1,7 +1,7 @@
 import BgFlourish from "../components/BgFlourish";
 import RunnerUp from "../components/RunnerUp";
 
-export default function () {
+export default function WinnerPage({ details }) {
   return (
     <div className="min-h-fit pb-20 flex justify-center text-white">
       <BgFlourish flourish="3" />

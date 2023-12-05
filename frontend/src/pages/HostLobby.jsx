@@ -1,9 +1,10 @@
+import { useParams } from "wouter";
 import BgFlourish from "../components/BgFlourish";
 import Button from "../components/Button";
 import { useState } from "react";
 
 export default function HostLobby() {
-  const roomCode = 123456;
+  const { roomCode } = useParams();
   const [players, setPlayers] = useState([
     {
       id: 1,
@@ -58,7 +59,10 @@ export default function HostLobby() {
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start w-1/3">
           {players ? (
             players.map((player) => (
-              <div key={player.id} className="w-1/3 text-white text-center py-2 px-2">
+              <div
+                key={player.id}
+                className="w-1/3 text-white text-center py-2 px-2"
+              >
                 <p>{player.name}</p>
               </div>
             ))

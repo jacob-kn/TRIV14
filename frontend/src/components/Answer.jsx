@@ -1,36 +1,15 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-export default function Answer({ id, selected, onClick, children, className }) {
+export default function Answer({ id, selected, onClick, clickable, children, className }) {
   const color = ["bg-blue-600", "bg-red-600", "bg-green-600", "bg-purple-600"];
-  
-  // const [selected, setSelected] = useState(false);
-  // let variant = "primary";
-
-  // const handleButtonClick = () => {
-  //   setSelected(true);
-  //   // variant = selected ? "secondary" : "primary";
-  //   onClick(id); // Pass the current id to the provided onClick handler
-  // };
-
-  // const variants = {
-  //   primary: {
-  //     border: "none"
-  //   },
-  //   secondary: {
-  //     border: "5px solid lightgreen",
-  //     boxSizing: "border-box",
-  //   },
-  // };
-
-  // const style = variants[variant] || {};
 
   return (
     <button
       onClick={() => {
-        // handleButtonClick();
         onClick(id)
       }}
+      disabled={clickable}
       className={className + ` ${color[id]}`}
       style={{
         color: "white",

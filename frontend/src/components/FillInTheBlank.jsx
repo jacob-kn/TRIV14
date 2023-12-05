@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 
-export default function FillInTheBlank({ paragraphText }) {
+export default function FillInTheBlank({ paragraphText, onTextChange }) {
   const [textInput, setTextInput] = useState("");
 
   const handleInputChange = (e) => {
     setTextInput(e.target.value);
+    onTextChange(e.target.value);
   };
 
   return (
