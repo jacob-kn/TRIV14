@@ -1,11 +1,17 @@
-import BgFlourish from "../components/BgFlourish";
-import CountdownBar from "../components/CountDownTimer";
-import FillInTheBlank from "../components/FillInTheBlank";
+import BgFlourish from "./BgFlourish";
+import CountdownBar from "./CountDownTimer";
+import Answer from "./Answer";
+import { useState } from "react";
 
-export default function FillBlanks() {
+export default function MultipleChoice({ question, options }) {
+  const [selectedButton, setSelectedButton] = useState(null);
   const totalSeconds = 60;
-  // Set custom paragraph to question where _ represent the blanks in the question
-  const customParagraph = "The quick brown _ jumps over the lazy dog.";
+
+  const handleSelect = (buttonId) => {
+    setSelectedButton(buttonId);
+    // Button logic here
+    console.log(`Button ${buttonId} clicked`);
+  };
 
   const handleCountdownEnd = () => {
     console.log('Time is up!');
@@ -26,7 +32,7 @@ export default function FillBlanks() {
         <CountdownBar totalSeconds={totalSeconds} onCountdownEnd={handleCountdownEnd}/>
         <div>
           <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">
-            What geometric shapes is generally used for stop signs?
+            {question}
           </h1>
         </div>
 
@@ -39,8 +45,19 @@ export default function FillBlanks() {
               <p className="text-white p-2 md:text-xl text-center">12345</p>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row flex-wrap justify-center md:w-1/2 gap-4 items-center md:items-start">
-            <FillInTheBlank paragraphText={customParagraph} />
+          <div className="flex flex-col md:flex-row flex-wrap justify-center md:w-1/2 gap-4">
+            {options.map((option, index) => {
+              // console.log("options index: " + index + ", text: " + option.text);
+              return (<Answer
+                key={index}
+                id={index}
+                selected={selectedButton === index}
+                onClick={handleSelect}
+                className="md:w-2/5 h-12 md:h-24 bg-blue-600"
+              >
+                {option.text}
+              </Answer>)
+            })}
           </div>
           <div className="flex flex-col items-center m-w-fit md:w-1/4">
             <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
@@ -57,7 +74,7 @@ export default function FillBlanks() {
                   </button>
                   <p className="text-white place-self-center">x2 Points</p>
                 </div>
-                <div className="flex flex-row justify-center md:justify-start w-[150px] opacity-50 pointer-events-none">
+                <div className="flex flex-row justify-center md:justify-start w-[150px]">
                   <button className="hover:scale-105 mx-2 rounded-full w-12 h-12 bg-[#20242B] shadow-md text-white flex justify-center items-center border-solid border-2 border-bunker-100">
                     <img
                       className="w-5 h-5"

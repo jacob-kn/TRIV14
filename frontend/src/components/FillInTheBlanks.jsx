@@ -1,19 +1,14 @@
-import Input from "../components/Input";
-import Button from "../components/Button";
-import BgFlourish from "../components/BgFlourish";
-import CountdownBar from "../components/CountDownTimer";
-import Answer from "../components/Answer";
-import { useState } from "react";
+import BgFlourish from "./BgFlourish";
+import CountdownBar from "./CountDownTimer";
+import FillInTheBlank from "./FillInTheBlank";
 
-export default function MultipleChoice() {
-  const [selectedButton, setSelectedButton] = useState(null);
+export default function FillInTheBlanks({ question, options }) {
   const totalSeconds = 60;
 
-  const handleSelect = (buttonId) => {
-    setSelectedButton(buttonId);
-    // Button logic here
-    console.log(`Button ${buttonId} clicked`);
-  };
+  const handleCountdownEnd = () => {
+    console.log('Time is up!');
+    // Timer = 0 logic here
+  }
 
   return (
     <div className="min-h-fit pb-16 mb-8">
@@ -26,53 +21,28 @@ export default function MultipleChoice() {
           </div>
           <h1 className="text-white text-2xl font-bold px-4">Traffic Signs</h1>
         </div>
-        <CountdownBar totalSeconds={totalSeconds} />
+        <CountdownBar totalSeconds={totalSeconds} onCountdownEnd={handleCountdownEnd}/>
         <div>
           <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">
-            What geometric shapes is generally used for stop signs?
+            {question}
           </h1>
         </div>
 
         <div className="flex flex-col md:flex-row justify-center w-full h-full px-4">
           <div className="flex flex-col items-center w-1/4">
             <div className="hidden md:block flex flex-col items-center justify-center bg-surface w-3/4 rounded-lg py-2">
-              <h2 className="text-white p-2 font-bold md:text-xl text-center">Score</h2>
+              <h2 className="text-white p-2 font-bold md:text-xl text-center">
+                Score
+              </h2>
               <p className="text-white p-2 md:text-xl text-center">12345</p>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row flex-wrap justify-center md:w-1/2 gap-4">
-            <Answer
-              id={1}
-              selected={selectedButton === 1}
-              onClick={handleSelect}
-              className="md:w-2/5 h-12 md:h-24 bg-blue-600"
-            >
-              Answer
-            </Answer>
-            <Answer
-              id={2}
-              selected={selectedButton === 2}
-              onClick={handleSelect}
-              className="md:w-2/5 h-12 md:h-24 bg-red-600"
-            >
-              Answer
-            </Answer>
-            <Answer
-              id={3}
-              selected={selectedButton === 3}
-              onClick={handleSelect}
-              className="md:w-2/5 h-12 md:h-24 bg-green-600"
-            >
-              Answer
-            </Answer>
-            <Answer
-              id={4}
-              selected={selectedButton === 4}
-              onClick={handleSelect}
-              className="md:w-2/5 h-12 md:h-24 bg-purple-600"
-            >
-              Answer
-            </Answer>
+          <div className="flex flex-col flex-wrap md:w-1/2 gap-4 items-start">
+            {/* <FillInTheBlank paragraphText={customParagraph} /> */}
+            {options.map((option, index) => {
+              // console.log("options index: " + index + ", text: " + option.text);
+              return (<FillInTheBlank key={index} paragraphText={option.text}/>)
+            })}
           </div>
           <div className="flex flex-col items-center m-w-fit md:w-1/4">
             <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
@@ -89,7 +59,7 @@ export default function MultipleChoice() {
                   </button>
                   <p className="text-white place-self-center">x2 Points</p>
                 </div>
-                <div className="flex flex-row justify-center md:justify-start w-[150px]">
+                <div className="flex flex-row justify-center md:justify-start w-[150px] opacity-50 pointer-events-none">
                   <button className="hover:scale-105 mx-2 rounded-full w-12 h-12 bg-[#20242B] shadow-md text-white flex justify-center items-center border-solid border-2 border-bunker-100">
                     <img
                       className="w-5 h-5"

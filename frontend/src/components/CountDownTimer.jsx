@@ -4,16 +4,29 @@ const CountdownBar = ({ totalSeconds, onCountdownEnd }) => {
   const [secondsRemaining, setSecondsRemaining] = useState(totalSeconds);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (secondsRemaining > 0) {
-        setSecondsRemaining(secondsRemaining - 1);
-      } else {
-        // Countdown reached 0, call the passed function
-        if (onCountdownEnd) {
-          onCountdownEnd();
-        }
+    let intervalId;
+
+    if (secondsRemaining > 0) {
+      intervalId = setInterval(() => {
+        setSecondsRemaining(prevSeconds => {
+          if (prevSeconds > 0) {
+            return prevSeconds - 1;
+          } else {
+            // Countdown reached 0, call the function
+            if (onCountdownEnd) {
+              onCountdownEnd();
+            }
+            clearInterval(intervalId);
+            return 0;
+          }
+        });
+      }, 1000);
+    } else {
+      // If initial secondsRemaining is 0, call the function immediately
+      if (onCountdownEnd) {
+        onCountdownEnd();
       }
-    }, 1000);
+    }
 
     return () => clearInterval(intervalId);
   }, [secondsRemaining, onCountdownEnd]);

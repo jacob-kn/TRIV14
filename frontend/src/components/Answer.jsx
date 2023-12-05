@@ -2,6 +2,8 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 
 export default function Answer({ id, selected, onClick, children, className }) {
+  const color = ["bg-blue-600", "bg-red-600", "bg-green-600", "bg-purple-600"];
+  
   // const [selected, setSelected] = useState(false);
   // let variant = "primary";
 
@@ -29,7 +31,7 @@ export default function Answer({ id, selected, onClick, children, className }) {
         // handleButtonClick();
         onClick(id)
       }}
-      className={className}
+      className={className + ` ${color[id]}`}
       style={{
         color: "white",
         borderRadius: "5px",
