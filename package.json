@@ -8,7 +8,8 @@
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
     "client": "npm start --prefix frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "NODE_ENV=test mocha backend/tests/**/*.test.js --recursive --exit"
   },
   "author": "",
   "license": "MIT",
@@ -22,7 +23,13 @@
     "mongoose": "^8.0.1"
   },
   "devDependencies": {
+    "chai": "^4.3.10",
     "concurrently": "^8.2.2",
-    "nodemon": "^3.0.1"
+    "jest-mock": "^29.7.0",
+    "mocha": "^10.2.0",
+    "mongodb-memory-server": "^9.1.1",
+    "nodemon": "^3.0.2",
+    "sinon": "^17.0.1",
+    "supertest": "^6.3.3"
   }
 }
