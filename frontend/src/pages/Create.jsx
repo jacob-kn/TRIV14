@@ -1,36 +1,29 @@
 import React, { useState } from 'react';
-import { useGetQuizQuery } from '../slices/quizzesApiSlice';
-import { Link, useLocation, useParams } from 'wouter';
-import Loader from '../components/Loader';
+
 import Button from '../components/Button';
 import IconButton from '../components/IconButton';
 import BgFlourish from '../components/BgFlourish';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-function Edit() {
-  const { quizId } = useParams(); // Extract the quizId from the URL parameters
-  const { data: quiz, isLoading, isError } = useGetQuizQuery(quizId);
-
-  
-
+function Create() {
   const defaultQuestion = {
     content: '',
     type: 'multipleChoice',
     answers: [{ text: 'a', correct: false }, { text: 'b', correct: false }, { text: 'c', correct: false }, { text: 'd', correct: false }],
   };
 
-  const [currentQuestions, setCurrentQuestions] = useState(quiz?.questions ? quiz.questions : [defaultQuestion]);
+  const [currentQuestions, setCurrentQuestions] = useState([defaultQuestion]);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [answerCount, setAnswerCount] = useState(4);
   
   
-  const [questionType, setQuestionType] = useState(quiz ? (quiz.questions[currentQuestionIndex]?.type || 'multipleChoice') : 'multipleChoice');
-  const [questionContent, setQuestionContent] = useState(quiz?.questions[currentQuestionIndex]?.question || '');
+  const [questionType, setQuestionType] = useState('multipleChoice');
+  const [questionContent, setQuestionContent] = useState('question');
   const [currentAnswers, setCurrentAnswers] = useState(new Array(answerCount).fill({ text: 'answer', correct: false }));
 
-  
+
   const changeQuestion = (index) => {
     if (index !== currentQuestionIndex) {
       // Save the current question's state before switching
@@ -69,6 +62,10 @@ function Edit() {
     if(currentQuestionIndex === index && currentQuestionIndex > 0) {
       
       changeQuestion(index - 1);
+    }
+    else if(currentQuestionIndex === index) {
+        changeQuestion(index + 1);
+        setCurrentQuestionIndex(0);
     }
     if (currentQuestions.length > 1) {
       const updatedQuestions = currentQuestions.filter((_, i) => i !== index); // Remove the corresponding question when its Delete button is clicked
@@ -118,17 +115,6 @@ function Edit() {
     setCurrentAnswers(updatedAnswers);
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
-  if (isError) {
-    return <h1 className="text-white">Error fetching quiz data</h1>;
-  }
-
-  if (!quiz) {
-    return <h1 className="text-white">No quiz data available</h1>;
-  }
 
   return (
     <div className="flex flex-row gap-9 ml-10">
@@ -270,4 +256,4 @@ function Edit() {
   );
 }
 
-export default Edit;
+export default Create;
