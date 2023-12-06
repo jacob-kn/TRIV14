@@ -5,7 +5,7 @@ import generateToken from '../utils/generateToken.js';
 
 /**
  * @desc register a new user
- * @route POST /api/users/user
+ * @route POST /api/users
  * @access public
  */
 const registerUser = asyncHandler(async (req, res) => {
@@ -177,14 +177,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  * @access private
  */
 const getUserQuizzes = asyncHandler(async (req, res) => {
-  const page = req.query.page || 1;
+  const page = req.query.page !== undefined ? req.query.page : 1;
 
   if (page < 1) {
     res.status(400);
     throw new Error('Page number must be greater than 0');
   }
 
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user._id);
 
   if (!user) {
     res.status(400);
