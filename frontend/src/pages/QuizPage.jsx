@@ -1,6 +1,6 @@
 import BgFlourish from "../components/BgFlourish";
 import CountdownBar from "../components/CountDownTimer";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MultipleChoice from "../components/MultipleChoice";
 import FillInTheBlanks from "../components/FillInTheBlanks";
 import { useGetQuizQuery } from "../slices/quizzesApiSlice";
@@ -10,11 +10,11 @@ import WinnerPage from "./WinnerPage";
 import { useParams } from "wouter";
 import { useGetUserQuery } from "../slices/auth/usersApiSlice";
 import { socket } from "../socket";
-import { setAnswer, selectAnswer } from '../slices/quizSlice';
-import { useDispatch, useSelector } from "react-redux";
+import { selectAnswer } from '../slices/quizSlice';
+import { useSelector } from "react-redux";
 
 export default function QuizPage() {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const { roomCode } = useParams();
   const [isStarted, setIsStarted] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -145,8 +145,6 @@ export default function QuizPage() {
     },
   ];
 
-  
-
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
       console.log(playerArray);
@@ -164,14 +162,21 @@ export default function QuizPage() {
 
     socket.on('correctAnswer', (correctOption) => {
       // players submit when the correctAnswer is emitted which means time is up
+      // dispatch(setAnswer(ans));
       console.log("Submitting: " + answer);
       console.log("For roomcode: " + roomCode);
       socket.emit('submitAnswer', answer, roomCode); //Todo - error
       console.log("Question time is up!\n" + "Correct answer: " + correctOption);
     })
 
+    socket.on('quizEnded', (scores) => {
+      console.log(scores);
+      setIsComplete(true);
+    })
+
     return () => {
-      socket.off("someEvent", () => {});
+      socket.off("updatedUserList", () => {});
+      socket.off('newQuestion', () => {});
     };
   }, [socket]);
 
@@ -182,7 +187,8 @@ export default function QuizPage() {
   };
 
   const handleUserInput = (ans) => {
-    dispatch(setAnswer(ans));
+    // dispatch(setAnswer(ans));
+    
     console.log("User's Input: " + answer);
   }  
 

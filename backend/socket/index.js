@@ -50,7 +50,7 @@ const setupWebSocket = (io) => {
             startQuiz(io, quiz, roomCode, duration, socket.id);
         })
 
-        socket.on('endQuiz', ({roomCode, quizID}) => {
+        socket.on('endQuiz', (roomCode, quizID) => {
             // Since quiz ended, we have to notify all the clients (in the respective namespace)
             io.to(roomCode).emit('quizEnded', {roomCode, quizID});
             io.to(roomCode).socketsLeave(roomCode);

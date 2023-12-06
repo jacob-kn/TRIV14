@@ -1,5 +1,7 @@
 import Answer from "./Answer";
 import { useState, useEffect } from "react";
+import { setAnswer } from '../slices/quizSlice';
+import { useDispatch } from "react-redux";
 
 export default function MultipleChoice({
   options,
@@ -8,10 +10,12 @@ export default function MultipleChoice({
   isClickable,
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
+  const dispatch = useDispatch();
   const handleSelect = (buttonId) => {
     setSelectedButton(buttonId);
     // Button logic here
     console.log(`Button ${buttonId} clicked`);
+    dispatch(setAnswer(options[buttonId].text));
     userInput(options[buttonId].text);
   };
 

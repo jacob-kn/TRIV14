@@ -121,6 +121,11 @@ export default function HostPage() {
       console.log("Question time is up!\n" + "Correction option: " + correctOption);
     })
 
+    socket.on('quizEnded', (scores) => {
+      console.log(scores);
+      setIsComplete(true);
+    })
+
     return () => {
       socket.off("someEvent", () => {});
     };
@@ -175,7 +180,7 @@ export default function HostPage() {
             <h2 className="text-white p-2 font-bold md:text-xl">
               Participants
             </h2>
-            <p className="text-white p-2 md:text-xl text-center">15</p>
+            <p className="text-white p-2 md:text-xl text-center">{players.length}</p>
           </div>
           <h1 className="text-white text-2xl font-bold px-4">
             {quizQuestion.title}
