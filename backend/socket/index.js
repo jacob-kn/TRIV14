@@ -1,4 +1,4 @@
-const { handleAnswer , startQuiz, handleNextQuestion } = require('../utils/quizLogic'); 
+import { handleAnswer, startQuiz, handleNextQuestion } from '../utils/quizLogic.js';
 
 const setupWebSocket = (io) => {
     io.on('connection', (socket) => {
