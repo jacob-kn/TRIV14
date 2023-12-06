@@ -1,4 +1,5 @@
 import { handleAnswer, startQuiz, handleNextQuestion } from '../utils/quizLogic.js';
+const roomData = new Map();
 
 const setupWebSocket = (io) => {
     io.on('connection', (socket) => {
@@ -18,20 +19,21 @@ const setupWebSocket = (io) => {
         socket.on('joinRoom', ({roomCode, username}) => {
             if(io.sockets.adapter.rooms.has(roomCode)){ // making sure the room exists before joining
                 socket.join(roomCode); // Putting the client into the room
-                socket.to(roomCode).emit('userJoined', {roomCode, username});
+                const usersInRoom = roomData.get(roomCode);
+                usersInRoom.set(socket.id, username);
+                
+                io.to(roomCode).emit('updatedUserList', Array.from(usersInRoom.values())); // sending client a list of all users in room
             } else {
                 socket.emit('invalidRoom', roomCode);
             }
         })
-        // Leaving room exists assuming we let clients leave rooms
-        socket.on('leaveRoom', ({roomCode, username}) => {
-            if(io.sockets.adapter.rooms.has(roomCode)){ 
-                socket.leave(roomCode);
-                socket.to(roomCode).emit('userLeft', {roomCode, username});
-            } 
-        })
         socket.on('createQuiz', (roomCode) => {
-            socket.join(roomCode); // Having the host join the room, ends up creating the room
+            if(!io.sockets.adapter.rooms.has(roomCode)){ 
+                socket.join(roomCode); // Having the host join the room, ends up creating the room
+                roomData.set(roomCode, new Map());
+            } else {
+                socket.emit('roomAlreadyExists', roomCode);
+            }
         })
 
         socket.on('startQuiz', ({ quiz, roomCode, duration}) => { // quiz is literally the json object
@@ -48,7 +50,7 @@ const setupWebSocket = (io) => {
             handleAnswer(io, socket.id, selectedAnswer, roomCode);
         })
         socket.on('nextQuestion', (roomCode) => {
-            handleNextQuestion(socket.id, roomCode);
+            handleNextQuestion(io, socket.id, roomCode);
         })
     });
 };
