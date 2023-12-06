@@ -11,6 +11,7 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
         if (currentQuestion < quiz.questions.length) {
             const fullQuestion = quiz.questions[currentQuestion];
             const questionToSend = {
+                title: fullQuestion.title,
                 type: fullQuestion.type,
                 question: fullQuestion.question,
                 options: fullQuestion.options.map(option => ({ text: option.text }))
@@ -48,10 +49,18 @@ function handleAnswer(socketId, submittedAnswer, roomCode) {
     }
 }
 
-function handleNextQuestion(socketId, roomCode) {
+function handleNextQuestion(io, socketId, roomCode) {
     const session = quizSessions.get(roomCode);
     if (session && session.hostId === socketId) { // verfying its the host doing this event
         session.nextQuestion();
+
+        const participantScores = session.scores;
+
+        // Send each participant their current score
+        for (let id in participantScores) {
+            const score = participantScores[id];
+            io.to(participantSocketId).emit('updateScore', score);
+        }
     }
 }
 
