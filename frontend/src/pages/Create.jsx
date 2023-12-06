@@ -1,28 +1,47 @@
 import React, { useState } from 'react';
-
+import { Link, useLocation } from 'wouter';
 import Button from '../components/Button';
+import Loader from '../components/Loader';
 import IconButton from '../components/IconButton';
 import BgFlourish from '../components/BgFlourish';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useAddQuizMutation } from '../slices/quizzesApiSlice';
+import { toast } from 'react-toastify';
 
 function Create() {
+  const [addQuiz, { isLoading }] = useAddQuizMutation();
+  const [, navigate] = useLocation();
+
+  const defaultTF = [
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: false },
+  ]
+
+  const defaultOptions = [
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
+  ];
   const defaultQuestion = {
     content: '',
-    type: 'multipleChoice',
-    answers: [{ text: 'a', correct: false }, { text: 'b', correct: false }, { text: 'c', correct: false }, { text: 'd', correct: false }],
+    type: 'Multiple Choice',
+    options: defaultOptions,
   };
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
 
   const [currentQuestions, setCurrentQuestions] = useState([defaultQuestion]);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
+  const [questionType, setQuestionType] = useState('Multiple Choice');
+  const [questionContent, setQuestionContent] = useState('');
+  
+  const [currentAnswers, setCurrentAnswers] = useState(defaultOptions);
   const [answerCount, setAnswerCount] = useState(4);
-  
-  
-  const [questionType, setQuestionType] = useState('multipleChoice');
-  const [questionContent, setQuestionContent] = useState('question');
-  const [currentAnswers, setCurrentAnswers] = useState(new Array(answerCount).fill({ text: 'answer', correct: false }));
-
 
   const changeQuestion = (index) => {
     if (index !== currentQuestionIndex) {
@@ -33,7 +52,7 @@ function Create() {
             ...question,
             type: questionType,
             content: questionContent,
-            answers: currentAnswers
+            options: currentAnswers
           };
         }
         return question;
@@ -46,11 +65,21 @@ function Create() {
       const selectedQuestion = updatedQuestions[index];
       setQuestionType(selectedQuestion.type);
       setQuestionContent(selectedQuestion.content);
-      setCurrentAnswers(selectedQuestion.answers);
+      setCurrentAnswers(selectedQuestion.options);
       setCurrentQuestions(updatedQuestions);
-      setAnswerCount(selectedQuestion.answers.length);
+      setAnswerCount(selectedQuestion.options.length);
       
     }
+  }
+
+  const handleTitleTextChange = (e) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+  };
+
+  const handleDescriptionTextChange = (e) => {
+    const newDesc = e.target.value;
+    setDescription(newDesc);
   }
 
   const addQuestion = () => {
@@ -59,47 +88,52 @@ function Create() {
   };
 
   const removeQuestion = (index) => {
-    if(currentQuestionIndex === index && currentQuestionIndex > 0) {
-      
-      changeQuestion(index - 1);
-    }
-    else if(currentQuestionIndex === index) {
-        changeQuestion(index + 1);
-        setCurrentQuestionIndex(0);
-    }
     if (currentQuestions.length > 1) {
+      if(currentQuestionIndex === index && currentQuestionIndex > 0) {
+        
+        changeQuestion(index - 1);
+      }
+      else if(currentQuestionIndex === index) {
+          changeQuestion(index + 1);
+          setCurrentQuestionIndex(0);
+      }
+    
       const updatedQuestions = currentQuestions.filter((_, i) => i !== index); // Remove the corresponding question when its Delete button is clicked
       setCurrentQuestions(updatedQuestions);
     }
-    
+    else {
+      toast.error("You cannot delete your only question");
+    }
   };
 
   const handleQuestionTypeChange = (event) => {
     setQuestionType(event.target.value); // Update the question type based on dropdown selection
-    // Adjust answers if switching from short answer to multiple choice
-    if (event.target.value === 'multipleChoice' && answerCount > 4) {
+    // Adjust options if switching from Fill in the Blank to multiple choice
+    if (event.target.value === 'Multiple Choice' && answerCount > 4) {
       setAnswerCount(4);
     }
-    if (event.target.value === 'multipleChoice' && answerCount < 2) {
+    if (event.target.value === 'Multiple Choice' && answerCount < 2) {
       setAnswerCount(2);
+      setCurrentAnswers(defaultTF);
     }
   };
 
   const addAnswer = () => {
-    if ((questionType === 'shortAnswer' && answerCount < 100) || (questionType === 'multipleChoice' && answerCount < 4)) {
-      const newAnswer = { text: '', correct: false }; // Create a new empty answer object
+    if ((questionType === 'Fill in the Blank' && answerCount < 100) || (questionType === 'Multiple Choice' && answerCount < 4)) {
+      const newAnswer = { text: '', correct: true }; // Create a new empty answer object
       setCurrentAnswers(prevAnswers => [...prevAnswers, newAnswer]); // Add the new answer to the currentAnswers state
       setAnswerCount(answerCount + 1);
     }
   };
 
   const removeAnswer = (index) => {
-    if ((questionType === 'shortAnswer' && answerCount > 1) || (questionType === 'multipleChoice' && answerCount > 2)) {
-
-      
+    if ((questionType === 'Fill in the Blank' && answerCount > 1) || (questionType === 'Multiple Choice' && answerCount > 2)) {
       const updatedAnswers = currentAnswers.filter((_, i) => i !== index); // Remove the corresponding question when its Delete button is clicked
       setCurrentAnswers(updatedAnswers);
       setAnswerCount(answerCount - 1);
+    }
+    else {
+      toast.error("Deletion failed; Your question currently has the minimum quanitity of answers.");
     }
   };
 
@@ -111,16 +145,56 @@ function Create() {
 
   const handleCorrectnessChange = (e, index) => {
     const updatedAnswers = [...currentAnswers];
-    updatedAnswers[index].correct = e.target.checked;
+    updatedAnswers[index].isCorrect = e.target.checked;
     setCurrentAnswers(updatedAnswers);
   };
 
+  const handleSaveQuiz = async () => {
+
+    const updatedQuestions = currentQuestions.map((question, i) => {
+        if (i === currentQuestionIndex) {
+          return {
+            ...question,
+            type: questionType,
+            question: questionContent,
+            options: currentAnswers
+          };
+        }
+        return question;
+      });
+
+    const checkboxes = document.querySelectorAll('#tagboxes input[type="checkbox"]:checked');
+    const tags = Array.from(checkboxes).map((checkbox) => checkbox.value);
+    
+    const thisQuiz = {
+      title,
+      description,
+      tags,
+      isPublic,
+      questions: updatedQuestions,
+      
+    };
+
+    console.log(thisQuiz);
+
+    try {
+      await addQuiz(thisQuiz).unwrap();
+      toast.success('Quiz created!');
+      navigate('/my-account'); 
+    } catch (error) {
+      toast.error('Unable to create quiz');
+    }
+  };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="flex flex-row gap-9 ml-10">
         <BgFlourish flourish="3" />
         
-
+        {/* List of Questions */}
         <div className='w-1/12'>
         <ul className=" md:max-w-7xl rounded-md">
           {currentQuestions.map((question, index) => (
@@ -142,9 +216,53 @@ function Create() {
       </div>
 
 
-        
-
         <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-4/5 mr-10">
+        <input
+            type="text"
+            id={`title`}
+            name={`title`}
+            value={title}
+            placeholder="Title"
+            className='text-black rounded-md p-1 mr-auto w-5/6'
+            onChange={(e) => handleTitleTextChange(e)}
+          />
+          <textarea 
+            value={description} 
+            onChange={(e) => handleDescriptionTextChange(e)} 
+            id="desc" 
+            name="desc" 
+            placeholder={`Description`} 
+            className="text-black w-full resize-none rounded-md">
+          </textarea>
+
+            <div id="tagboxes" className='flex flex-row gap-10 '>
+              <label>
+                <input type="checkbox" name="Math" value=" Math" />
+                Math
+              </label>
+              <label>
+                <input type="checkbox" name="Science" value=" Science" />
+                Science
+              </label>
+              <label>
+                <input type="checkbox" name="History" value=" History" />
+                History
+              </label>
+              <label>
+                <input type="checkbox" name="Literature" value=" Literature" />
+                Literature
+              </label>
+              <label>
+                <input type="checkbox" name="Geography" value=" Geography" />
+                Geography
+              </label>
+              <label>
+                <input type="checkbox" name="PopCulture" value=" Pop Culture" />
+                Pop Culture
+              </label>
+            </div>
+
+            
             <h2 className="mr-auto">Question {currentQuestionIndex + 1}</h2>
     
             {/* Dropdown for Question type */}
@@ -157,19 +275,19 @@ function Create() {
                     value={questionType}
                     onChange={handleQuestionTypeChange}
                 >
-                    <option value="multipleChoice">Multiple choice</option>
-                    <option value="shortAnswer">Short answer</option>
+                    <option value="Multiple Choice">Multiple choice</option>
+                    <option value="Fill in the Blank">Fill in the Blank</option>
                 </select>
             </div>
     
             {/* Text field for Question */}
             <div className="flex flex-col gap-2 mr-auto w-full">
                 <label htmlFor="questionInput">Question</label>
-                <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" className="text-black h-20 resize-none rounded-md"></textarea>
+                <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" placeholder={`Enter question`} className="text-black h-20 resize-none rounded-md"></textarea>
             </div>
 
             {/*Render Multiple Choice */}
-            {questionType === 'multipleChoice' && (
+            {questionType === 'Multiple Choice' && (
             <div className='flex flex-row gap-4 w-full justify-between'>
                 {Array.from({ length: answerCount }).map((_, index) => (
                 
@@ -180,7 +298,7 @@ function Create() {
                     </IconButton>
                     <input
                       type="checkbox"
-                      checked={currentAnswers[index]?.correct || false}
+                      checked={currentAnswers[index]?.isCorrect}
                       id={`checkbox${index + 1}`}
                       name={`checkbox${index + 1}`}
                       className='ml-auto mr-2'
@@ -191,8 +309,9 @@ function Create() {
                       type="text"
                       id={`input${index + 1}`}
                       name={`input${index + 1}`}
+                      placeholder={`Answer ${index + 1}`}
                       className='text-black rounded-md p-1 m-3 w-5/6'
-                      value={currentAnswers[index].text}
+                      value={currentAnswers[index].text || ''}
                       onChange={(e) => handleAnswerTextChange(e, index)}
                     />
                 </div>
@@ -202,19 +321,19 @@ function Create() {
             )}
             
 
-            {/* Render text fields for short answers */}
-            {questionType === 'shortAnswer' && (
+            {/* Render text fields for Fill in the Blanks */}
+            {questionType === 'Fill in the Blank' && (
             <div className="flex flex-col gap-4 w-full justify-between">
-                {/* Render text fields for short answers */}
+                {/* Render text fields for Fill in the Blanks */}
                 {Array.from({ length: answerCount }).map((_, index) => (
                 <div key={index} className="bg-haiti rounded-md px-2 py-4 flex flex-row ">
                     <input
                     type="text"
                     id={`input${index + 1}`}
                     name={`input${index + 1}`}
-                    placeholder={`Short Answer ${index + 1}`}
+                    placeholder={`Fill in the Blank ${index + 1}`}
                     className="text-black  rounded-md p-1 w-full"
-                    value={currentAnswers[index].text}
+                    value={currentAnswers[index].text || ''}
                     onChange={(e) => handleAnswerTextChange(e, index)}
                     />
                     <IconButton className="inline m-1" type="secondary" onClick={() => removeAnswer(index)}>
@@ -229,12 +348,14 @@ function Create() {
         
             {/* Cancel & Delete Buttons */}
             <div className="grid grid-cols-4 gap-4 w-full">
+              <Link to="/my-account">
                 <Button isSubmit type="tertiary" className="w-full">
-                Cancel
+                  Exit
                 </Button>
-                <Button isSubmit type="secondary" className="w-full">
+              </Link>
+              <Button isSubmit type="secondary" className="w-full" onClick={handleSaveQuiz}>
                 Save Quiz
-                </Button>
+              </Button>
             </div>
             <style jsx>{`
                 .grid {
@@ -249,8 +370,6 @@ function Create() {
             
 
         </div>
-
-        
 
     </div>
   );
