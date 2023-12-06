@@ -10,35 +10,32 @@ import WinnerPage from "./WinnerPage";
 import { useParams } from "wouter";
 import { useGetUserQuery } from "../slices/auth/usersApiSlice";
 import { socket } from "../socket";
+import { setAnswer, selectAnswer } from '../slices/quizSlice';
+import { useDispatch, useSelector } from "react-redux";
 
 export default function QuizPage() {
+  const dispatch = useDispatch();
   const { roomCode } = useParams();
   const [isStarted, setIsStarted] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState();
   const [isClickable, setIsClickable] = useState(true);
-  const [answer, setAnswer] = useState("");
-
-  const quizIds = [
-    "65691706b7ef6d91783b40b3",
-    "6569172db7ef6d91783b40b7",
-    "65695f051f91c7420db36625",
-    "656b7e516b12c29574edc587",
-  ];
+  const [players, setPlayers] = useState([]);
+  const answer = useSelector(selectAnswer);
+  const timeRemaining = 60;
+  const [startCountdown, setStartCountdown] = useState(false);
 
   // use quiz id after joining a room to query and get
-  const { data: quiz1, isLoading } = useGetQuizQuery(quizIds[3]);
-  const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
+  const { data: user, isLoading } = useGetUserQuery();
 
   // initial: false, changes to true when start quiz event is fired
 
   // either given by host or incremented by some event (next question event)
-  let questionIndex = 0;
 
   // updated when the host tries to go to the next question after the last
-  let isComplete = false;
 
   // time remaining
-  const timeRemaining = 60;
+  
 
   // score
   let score = 0;
@@ -148,16 +145,7 @@ export default function QuizPage() {
     },
   ];
 
-  // replace with actual array of players from backend (through sockets)
-  const [players, setPlayers] = useState([]);
-  //   "Alice",
-  //   "Bob",
-  //   "Charlie",
-  //   "Eve",
-  //   "Xander",
-  //   "Yvonne",
-  //   "Zane",
-  // ]);
+  
 
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
@@ -170,9 +158,17 @@ export default function QuizPage() {
       // setQuizQuestion(questionObject);
       console.log(questionObject);
       setQuizQuestion(questionObject);
-      
+      setStartCountdown(true);
       setIsStarted(true);
     });
+
+    socket.on('correctAnswer', (correctOption) => {
+      // players submit when the correctAnswer is emitted which means time is up
+      console.log("Submitting: " + answer);
+      console.log("For roomcode: " + roomCode);
+      socket.emit('submitAnswer', answer, roomCode); //Todo - error
+      console.log("Question time is up!\n" + "Correct answer: " + correctOption);
+    })
 
     return () => {
       socket.off("someEvent", () => {});
@@ -180,32 +176,19 @@ export default function QuizPage() {
   }, [socket]);
 
   const handleCountdownEnd = () => {
-    setIsClickable(false);
-    
-    console.log("Time is up!");
+    // setIsClickable(false);
+    setStartCountdown(false);
+    // console.log("Time is up!");
   };
 
   const handleUserInput = (ans) => {
-    setAnswer(ans);
-    console.log("User's Input: " + ans);
-  }
-
-  useEffect(() => {
-    console.log("Submitting: " + answer);
-  }, [isClickable])
-  
+    dispatch(setAnswer(ans));
+    console.log("User's Input: " + answer);
+  }  
 
   if (isLoading) {
     return <Spinner />;
   }
-
-  if (isLoadingUser) {
-    return <Spinner />;
-  } else {
-    // console.log(user.username);
-  }
-
-  // console.log(quiz);
 
   if (!isStarted) {
     return (
@@ -238,6 +221,7 @@ export default function QuizPage() {
           <CountdownBar
             totalSeconds={timeRemaining}
             onCountdownEnd={handleCountdownEnd}
+            startCountdown={startCountdown}
           />
           <div>
             <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">

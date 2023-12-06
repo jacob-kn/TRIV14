@@ -1,35 +1,38 @@
 import React, { useState, useEffect } from "react";
 
-const CountdownBar = ({ totalSeconds, onCountdownEnd }) => {
+const CountdownBar = ({ totalSeconds, onCountdownEnd, startCountdown }) => {
   const [secondsRemaining, setSecondsRemaining] = useState(totalSeconds);
 
   useEffect(() => {
     let intervalId;
 
-    if (secondsRemaining > 0) {
+    if (startCountdown) {
+      // Reset the countdown when startCountdown is true
+      setSecondsRemaining(totalSeconds);
+
+      // Start the countdown
       intervalId = setInterval(() => {
         setSecondsRemaining(prevSeconds => {
           if (prevSeconds > 0) {
             return prevSeconds - 1;
           } else {
             // Countdown reached 0, call the function
+            clearInterval(intervalId);
             if (onCountdownEnd) {
               onCountdownEnd();
             }
-            clearInterval(intervalId);
-            return 0;
+            return prevSeconds;
           }
         });
       }, 1000);
     } else {
-      // If initial secondsRemaining is 0, call the function immediately
-      if (onCountdownEnd) {
-        onCountdownEnd();
-      }
+      // If startCountdown is false, clear the interval
+      clearInterval(intervalId);
     }
 
+    // Cleanup the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [secondsRemaining, onCountdownEnd]);
+  }, [startCountdown, onCountdownEnd, totalSeconds]);
 
   const barWidth = 100 - (1 - secondsRemaining / totalSeconds) * 100;
 

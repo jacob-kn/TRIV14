@@ -22,7 +22,7 @@ function App() {
     <div className="relative overflow-hidden min-h-screen">
       <Header />
       <Route path="/" component={Main} />
-      <Route path="/:roomCode" component={EnterQuiz} />
+      <Route path="/entername/:roomCode" component={EnterQuiz} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/my-account" component={MyAccount} />

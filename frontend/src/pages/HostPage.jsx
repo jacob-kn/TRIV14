@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react";
 import { useGetQuizQuery } from "../slices/quizzesApiSlice";
-import Spinner from "../components/Spinner";
-import WinnerPage from "./WinnerPage";
 import { useParams } from "wouter";
 import { useGetUserQuery } from "../slices/auth/usersApiSlice";
+import { socket } from "../socket";
+import { useSelector } from "react-redux";
+import { selectQuizId } from "../slices/quizSlice";
+import Spinner from "../components/Spinner";
+import WinnerPage from "./WinnerPage";
 import HostLobby from "./HostLobby";
 import BgFlourish from "../components/BgFlourish";
 import CountdownBar from "../components/CountDownTimer";
 import Button from "../components/Button";
-import { socket } from "../socket";
-import { useSelector } from "react-redux";
-import { selectQuizId } from "../slices/quizSlice";
 import Answer from "../components/Answer";
+import FillInTheBlank from "../components/FillInTheBlank";
 
 export default function HostPage() {
   const [players, setPlayers] = useState([]);
   const currentQuizId = useSelector(selectQuizId);
   const { roomCode } = useParams();
   const duration = 60;
+  const [startCountdown, setStartCountdown] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState();
   const [isStarted, setIsStarted] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   const [currentQuestion, setCurrentQuestion] = useState();
   const quizIds = [
@@ -36,10 +39,9 @@ export default function HostPage() {
   // initial: false, changes to true when start quiz event is fired
 
   // either given by host or incremented by some event (next question event)
-  let questionIndex = 0;
+  let questionIndex = 1;
 
   // updated when the host tries to go to the next question after the last
-  let isComplete = false;
 
   // time remaining
   let timeRemaining = 60;
@@ -111,8 +113,13 @@ export default function HostPage() {
       // setQuizQuestion(questionObject);
       console.log(questionObject);
       setQuizQuestion(questionObject);
+      setStartCountdown(true);
       setIsStarted(true);
     });
+
+    socket.on('correctAnswer', (correctOption) => {
+      console.log("Question time is up!\n" + "Correction option: " + correctOption);
+    })
 
     return () => {
       socket.off("someEvent", () => {});
@@ -121,6 +128,7 @@ export default function HostPage() {
 
   const handleCountdownEnd = () => {
     console.log("Time is up!");
+    setStartCountdown(false);
   };
 
   const handleStartQuiz = () => {
@@ -176,6 +184,7 @@ export default function HostPage() {
         <CountdownBar
           totalSeconds={timeRemaining}
           onCountdownEnd={handleCountdownEnd}
+          startCountdown={startCountdown}
         />
 
         <div>
@@ -189,7 +198,9 @@ export default function HostPage() {
               <h2 className="text-white p-2 font-bold md:text-xl text-center">
                 Participants
               </h2>
-              <p className="text-white p-2 md:text-xl text-center">{players.length}</p>
+              <p className="text-white p-2 md:text-xl text-center">
+                {players.length}
+              </p>
             </div>
           </div>
           <div className="flex flex-col md:flex-row flex-wrap justify-center md:w-1/2 gap-4">
@@ -213,63 +224,39 @@ export default function HostPage() {
                     })}
                   </>
                 ) : (
-                  // <MultipleChoice
-                  //   options={quiz.questions[questionIndex].options}
-                  //   isClickable={false}
-                  // />
-                  <></>
-                  // <FillInTheBlanks
-                  //   options={quiz.questions[questionIndex].options}
-                  // />
+                  <>
+                    {" "}
+                    {quizQuestion.map((option, index) => {
+                      // console.log("options index: " + index + ", text: " + option.text);
+                      return (
+                        <FillInTheBlank
+                          key={index}
+                          paragraphText={option.text}
+                          onTextChange={() => {}}
+                        />
+                      );
+                    })}
+                  </>
                 )}
               </>
             ) : (
               <Spinner />
             )}
-            {/* {options.map((option, index) => {
-          return (
-            <Answer
-              key={index}
-              id={index}
-              selected={selectedButton === index}
-              onClick={handleSelect}
-              clickable={!isClickable}
-              className="md:w-2/5 h-12 md:h-24 bg-blue-600"
-            >
-              {option.text}
-            </Answer>
-          );
-        })} */}
           </div>
           <div className="flex flex-col items-center m-w-fit md:w-1/4">
             <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
               <h2 className="text-white p-2 font-bold md:text-xl text-center">
-                {questionIndex + 1} of {quiz.questions.length}
+                {questionIndex} of {quiz1.questions.length}
               </h2>
               <div className="flex flex-row md:flex-col gap-4 my-4 items-center justify-center">
-                <Button>Next</Button>
+                <Button onClick={() => {
+                  console.log("Next button clicked - going to the next question.");
+                  socket.emit('nextQuestion', roomCode);
+                }}>Next</Button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* {quiz ? (
-          <>
-            {}
-            {quiz.questions[questionIndex].type === "Multiple Choice" ? (
-              <MultipleChoice
-                options={quiz.questions[questionIndex].options}
-                isClickable={false}
-              />
-            ) : (
-              <FillInTheBlanks
-                options={quiz.questions[questionIndex].options}
-              />
-            )}
-          </>
-        ) : (
-          <Spinner />
-        )} */}
       </div>
     </div>
   );

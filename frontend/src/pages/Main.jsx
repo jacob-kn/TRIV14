@@ -23,7 +23,7 @@ function Main() {
           // } else {}
           // socket.emit('joinRoom', roomCode, "Alice");
           // else go to the page 
-          navigate("/" + roomCode);
+          navigate("/entername/" + roomCode);
         })
 
         return () => {

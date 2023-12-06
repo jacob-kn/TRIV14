@@ -56,9 +56,13 @@ const setupWebSocket = (io) => {
             io.to(roomCode).socketsLeave(roomCode);
         })
 
-        socket.on('submitAnswer', ({selectedAnswer, roomCode}) => {
+        socket.on('submitAnswer', (selectedAnswer, roomCode) => {
+            console.log("Handling answer");
+            console.log("room code: " + roomCode);
+            console.log("answer: " + selectedAnswer);
             handleAnswer(io, socket.id, selectedAnswer, roomCode);
         })
+
         socket.on('nextQuestion', (roomCode) => {
             handleNextQuestion(io, socket.id, roomCode);
         })

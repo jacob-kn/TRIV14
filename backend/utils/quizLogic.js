@@ -23,7 +23,7 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
             setTimeout(() => {
                 const correctOption = fullQuestion.options.find(option => option.isCorrect);
                 io.to(roomCode).emit('correctAnswer', correctOption.text); // Emit only the text of the correct option
-            }, duration);
+            }, duration * 1000);
 
         } else {
             // End of the quiz
@@ -37,8 +37,10 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
     quizSessions.set(roomCode, { quiz, currentQuestion, scores, nextQuestion, hostId });
 }
 
-function handleAnswer(socketId, submittedAnswer, roomCode) {
+function handleAnswer(io, socketId, submittedAnswer, roomCode) {
+    console.log("handling answers for roomcode: " + roomCode);
     const session = quizSessions.get(roomCode);
+    console.log(session);
     const currentQuestion = session.quiz.questions[session.currentQuestion];
 
     if (currentQuestion) {
