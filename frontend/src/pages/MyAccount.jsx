@@ -118,37 +118,37 @@ function MyAccount() {
               Create quiz
             </Button>
           </Link>
-        </div>
 
-        {isLoadingQuizzes ? (
-          <Spinner />
-        ) : isErrorQuizzes ? (
-          <div className="flex justify-center">
-            <h3 className="text-gray-200 flex gap-2">
-              <ExclamationCircleIcon className="w-6 h-6" />
-              Could not load quizzes. Please try again later.
-            </h3>
-          </div>
-        ) : !quizzes.length ? (
-          <div className="flex justify-center">
-            <h3 className="text-gray-200">
-              You have not created any quizzes yet.
-            </h3>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap justify-center gap-8">
-              {quizzes.map((quizId) => (
-                <QuizCard key={quizId} quizId={quizId} isOwned />
-              ))}
+          {isLoadingQuizzes ? (
+            <Spinner />
+          ) : isErrorQuizzes ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200 flex gap-2">
+                <ExclamationCircleIcon className="w-6 h-6" />
+                Could not load quizzes. Please try again later.
+              </h3>
             </div>
-            <Pagination
-              totalPages={totalPages}
-              currentPage={page}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+          ) : !quizzes.length ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200">
+                You have not created any quizzes yet.
+              </h3>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-center gap-8 max-w-[1500px]">
+                {quizzes.map((quizId) => (
+                  <QuizCard key={quizId} quizId={quizId} isOwned />
+                ))}
+              </div>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={page}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+        </div>
       </div>
     </>
   );

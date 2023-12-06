@@ -9,7 +9,9 @@ import quizRoutes from './routes/quizRoutes.js';
 
 const port = process.env.PORT || 5000;
 
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 const app = express();
 app.use(express.json());
@@ -24,4 +26,8 @@ app.use('/api/quizzes', quizRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => console.log(`Server started on port ${port}`));
+}
+
+export default app;

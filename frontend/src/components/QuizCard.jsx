@@ -57,7 +57,7 @@ const QuizCard = ({ quizId, isOwned }) => {
 
   if (isError) {
     return (
-      <div className="flex items-center px-6 p-6 rounded-xl bg-gray-700 w-96 h-[280px]">
+      <div className="flex items-center px-6 p-6 rounded-xl bg-gray-700 max-w-[24rem] w-[90vw] h-[280px]">
         <h1 className="flex flex-col items-center text-xl text-white sm:text-2xl font-bold text-center w-full px-10 line-clamp-4">
           <ExclamationCircleIcon className="w-8 h-8" />
           Error: {error?.data?.message || error.error}
@@ -69,7 +69,7 @@ const QuizCard = ({ quizId, isOwned }) => {
   // Skeleton loading state
   if (isLoading || isFetching || isError) {
     return (
-      <div className="flex flex-col gap-6 items-center px-6 p-6 rounded-xl bg-gray-700 w-96">
+      <div className="flex flex-col gap-6 items-center px-6 p-6 rounded-xl bg-gray-700 max-w-[24rem] w-[90vw]">
         <div className="w-1/2 h-10 rounded-md bg-gray-600 animate-pulse"></div>
         <div className="w-3/4 h-4 rounded-md bg-gray-600 animate-pulse"></div>
         <div className="w-3/4 h-4 -mt-4 rounded-md bg-gray-600 animate-pulse"></div>
@@ -86,7 +86,7 @@ const QuizCard = ({ quizId, isOwned }) => {
   }
 
   return (
-    <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-96">
+    <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white max-w-[24rem] w-[90vw]">
       <h3 className="text-xl sm:text-2xl font-bold text-center w-full px-10 line-clamp-2">
         {quiz.title}
       </h3>
