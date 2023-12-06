@@ -13,7 +13,8 @@ import { socket } from "../socket";
 
 export default function QuizPage() {
   const { roomCode } = useParams();
-  const [currentQuestion, setCurrentQuestion] = useState();
+  const [isStarted, setIsStarted] = useState(false);
+  const [quizQuestion, setQuizQuestion] = useState();
   const [isClickable, setIsClickable] = useState(true);
   const [answer, setAnswer] = useState("");
 
@@ -29,7 +30,6 @@ export default function QuizPage() {
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
 
   // initial: false, changes to true when start quiz event is fired
-  let isStarted = false;
 
   // either given by host or incremented by some event (next question event)
   let questionIndex = 0;
@@ -41,7 +41,7 @@ export default function QuizPage() {
   const timeRemaining = 60;
 
   // score
-  let score = 1234;
+  let score = 0;
 
   // details for the winner
 
@@ -163,7 +163,15 @@ export default function QuizPage() {
     socket.on("updatedUserList", (playerArray) => {
       console.log(playerArray);
       setPlayers(playerArray);
+    });
+
+    socket.on('newQuestion', (questionObject) => {
+      console.log("Received question object.");
+      // setQuizQuestion(questionObject);
+      console.log(questionObject);
+      setQuizQuestion(questionObject);
       
+      setIsStarted(true);
     });
 
     return () => {
@@ -185,6 +193,7 @@ export default function QuizPage() {
   useEffect(() => {
     console.log("Submitting: " + answer);
   }, [isClickable])
+  
 
   if (isLoading) {
     return <Spinner />;
@@ -224,7 +233,7 @@ export default function QuizPage() {
               <h2 className="text-white p-2 font-bold md:text-xl">Score</h2>
               <p className="text-white p-2 md:text-xl text-center">{score}</p>
             </div>
-            <h1 className="text-white text-2xl font-bold px-4">{quiz.title}</h1>
+            <h1 className="text-white text-2xl font-bold px-4">{quizQuestion.title}</h1>
           </div>
           <CountdownBar
             totalSeconds={timeRemaining}
@@ -232,22 +241,22 @@ export default function QuizPage() {
           />
           <div>
             <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">
-              {quiz.questions[questionIndex].question}
+              {quizQuestion.question}
             </h1>
           </div>
 
-          {quiz ? (
+          {quizQuestion ? (
             <>
-              {quiz.questions[questionIndex].type === "Multiple Choice" ? (
+              {quizQuestion.type === "Multiple Choice" ? (
                 <MultipleChoice
-                  options={quiz.questions[questionIndex].options}
+                  options={quizQuestion.options}
                   score={score}
                   userInput={handleUserInput}
                   isClickable={isClickable}
                 />
               ) : (
                 <FillInTheBlanks
-                  options={quiz.questions[questionIndex].options}
+                  options={quizQuestion.options}
                   score={score}
                   userInput={handleUserInput}
                 />

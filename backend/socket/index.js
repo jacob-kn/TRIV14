@@ -42,8 +42,11 @@ const setupWebSocket = (io) => {
                 socket.emit('roomAlreadyExists', roomCode);
             }
         })
-
-        socket.on('startQuiz', ({ quiz, roomCode, duration}) => { // quiz is literally the json object
+        
+        socket.on('startQuiz', ( quiz, roomCode, duration) => { // quiz is literally the json object
+            console.log(quiz);
+            console.log(roomCode);
+            console.log(duration);
             startQuiz(io, quiz, roomCode, duration, socket.id);
         })
 

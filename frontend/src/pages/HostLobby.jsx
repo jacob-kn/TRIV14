@@ -3,12 +3,8 @@ import BgFlourish from "../components/BgFlourish";
 import Button from "../components/Button";
 import Spinner from "../components/Spinner";
 
-export default function HostLobby({ players }) {
+export default function HostLobby({ players, startQuiz }) {
   const { roomCode } = useParams();
-
-  const startQuiz = () => {
-    console.log("Host is starting the quiz.");
-  }
 
   return (
     <div className="min-h-fit pt-8 pb-16 mb-8">

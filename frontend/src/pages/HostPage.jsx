@@ -10,12 +10,16 @@ import CountdownBar from "../components/CountDownTimer";
 import Button from "../components/Button";
 import { socket } from "../socket";
 import { useSelector } from "react-redux";
-import { selectQuizId } from '../slices/quizSlice';
+import { selectQuizId } from "../slices/quizSlice";
+import Answer from "../components/Answer";
 
 export default function HostPage() {
   const [players, setPlayers] = useState([]);
-
   const currentQuizId = useSelector(selectQuizId);
+  const { roomCode } = useParams();
+  const duration = 60;
+  const [quizQuestion, setQuizQuestion] = useState();
+  const [isStarted, setIsStarted] = useState(false);
 
   const [currentQuestion, setCurrentQuestion] = useState();
   const quizIds = [
@@ -25,14 +29,11 @@ export default function HostPage() {
     "656b7e516b12c29574edc587",
   ];
 
-  // console.log(params);
-
   // use quiz id after joining a room to query and get
-  const { data: quiz1, isLoading } = useGetQuizQuery(quizIds[3]);
+  const { data: quiz1, isLoading } = useGetQuizQuery(currentQuizId);
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
 
   // initial: false, changes to true when start quiz event is fired
-  let isStarted = false;
 
   // either given by host or incremented by some event (next question event)
   let questionIndex = 0;
@@ -44,19 +45,6 @@ export default function HostPage() {
   let timeRemaining = 60;
 
   // details for the winner
-
-  useEffect(() => {
-    socket.on("updatedUserList", (playerArray) => {
-      console.log(playerArray);
-      setPlayers(playerArray);
-      
-      console.log("Store current quiz Id: " + currentQuizId);
-    });
-
-    return () => {
-      socket.off("someEvent", () => {});
-    };
-  }, [socket]);
 
   // temp for testing
   const quiz = {
@@ -110,19 +98,38 @@ export default function HostPage() {
     ],
   };
 
-  // replace with actual array of players from backend (through sockets)
-  // const [players, setPlayers] = useState([
-  //   "Alice",
-  //   "Bob",
-  //   "Charlie",
-  //   "Eve",
-  //   "Xander",
-  //   "Yvonne",
-  //   "Zane",
-  // ]);
+  useEffect(() => {
+    socket.on("updatedUserList", (playerArray) => {
+      console.log(playerArray);
+      setPlayers(playerArray);
+
+      console.log("Store current quiz Id: " + currentQuizId);
+    });
+
+    socket.on("newQuestion", (questionObject) => {
+      console.log("Received question object.");
+      // setQuizQuestion(questionObject);
+      console.log(questionObject);
+      setQuizQuestion(questionObject);
+      setIsStarted(true);
+    });
+
+    return () => {
+      socket.off("someEvent", () => {});
+    };
+  }, [socket]);
 
   const handleCountdownEnd = () => {
     console.log("Time is up!");
+  };
+
+  const handleStartQuiz = () => {
+    console.log("Starting the quiz.");
+    console.log(quiz1);
+    console.log(quiz1.questions.length);
+    console.log(roomCode);
+    console.log(duration);
+    socket.emit("startQuiz", quiz1, roomCode, duration);
   };
 
   if (isLoading) {
@@ -138,7 +145,7 @@ export default function HostPage() {
   if (!isStarted) {
     return (
       <>
-        <HostLobby players={players} />
+        <HostLobby players={players} startQuiz={handleStartQuiz} />
       </>
     );
   }
@@ -162,7 +169,9 @@ export default function HostPage() {
             </h2>
             <p className="text-white p-2 md:text-xl text-center">15</p>
           </div>
-          <h1 className="text-white text-2xl font-bold px-4">{quiz.title}</h1>
+          <h1 className="text-white text-2xl font-bold px-4">
+            {quizQuestion.title}
+          </h1>
         </div>
         <CountdownBar
           totalSeconds={timeRemaining}
@@ -171,7 +180,7 @@ export default function HostPage() {
 
         <div>
           <h1 className="text-white text-2xl font-bold mb-4 px-4 text-center">
-            {quiz.questions[questionIndex].question}
+            {quizQuestion.question}
           </h1>
         </div>
         <div className="flex flex-col md:flex-row justify-center w-full h-full px-4">
@@ -180,14 +189,29 @@ export default function HostPage() {
               <h2 className="text-white p-2 font-bold md:text-xl text-center">
                 Participants
               </h2>
-              <p className="text-white p-2 md:text-xl text-center">15</p>
+              <p className="text-white p-2 md:text-xl text-center">{players.length}</p>
             </div>
           </div>
           <div className="flex flex-col md:flex-row flex-wrap justify-center md:w-1/2 gap-4">
-            {quiz ? (
+            {quizQuestion ? (
               <>
-                {quiz.questions[questionIndex].type === "Multiple Choice" ? (
-                  <></>
+                {quizQuestion.type === "Multiple Choice" ? (
+                  <>
+                    {quizQuestion.options.map((option, index) => {
+                      return (
+                        <Answer
+                          key={index}
+                          id={index}
+                          selected={false}
+                          onClick={() => {}}
+                          clickable={false}
+                          className="md:w-2/5 h-12 md:h-24 bg-blue-600"
+                        >
+                          {option.text}
+                        </Answer>
+                      );
+                    })}
+                  </>
                 ) : (
                   // <MultipleChoice
                   //   options={quiz.questions[questionIndex].options}

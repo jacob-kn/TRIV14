@@ -2,7 +2,7 @@ const quizSessions = new Map();
 const POINTS_PER_CORRECT_ANSWER = 1;
 
 function startQuiz(io, quiz, roomCode, duration, hostId) {
-    let currentQuestion = 0;
+    let currentQuestion = -1;
     let scores = {};
 
     function nextQuestion() {
@@ -11,7 +11,7 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
         if (currentQuestion < quiz.questions.length) {
             const fullQuestion = quiz.questions[currentQuestion];
             const questionToSend = {
-                title: fullQuestion.title,
+                title: quiz.title,
                 type: fullQuestion.type,
                 question: fullQuestion.question,
                 options: fullQuestion.options.map(option => ({ text: option.text }))
