@@ -5,8 +5,8 @@ export const quizzesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getQuizzes: builder.query({
       // gets an array of quiz ids of all public quizzes
-      query: () => ({
-        url: `${QUIZZES_URL}`,
+      query: (data) => ({
+        url: `${QUIZZES_URL}?page=${data.page}&sort=${data.sort}&filter=${data.filter}`,
         method: 'GET',
       }),
       providesTags: [{ type: 'Quiz', id: 'PUBLIC' }],
@@ -48,7 +48,7 @@ export const quizzesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) =>
         // if the quiz publication changed, invalidate the Quiz tag with id 'PUBLIC'
-        result.publicationChange
+        result && result.publicationChange
           ? [
               { type: 'Quiz', id: arg._id },
               { type: 'Quiz', id: 'PUBLIC' },

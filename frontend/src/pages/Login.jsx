@@ -54,11 +54,11 @@ function Login() {
       {isLoading && <Loader />}
       <BgFlourish flourish="2" />
 
-      <div className="flex justify-center items-center w-screen h-full my-24">
-        <div className="relative bg-surface w-3/4 max-w-md rounded-xl p-12">
+      <div className="flex justify-center items-center w-screen h-full my-8 md:my-24">
+        <div className="relative bg-surface w-[90%] sm:w-3/4 sm:max-w-md rounded-xl px-6 py-10 sm:p-12">
           <img
             src={process.env.PUBLIC_URL + '/flourishes/auth-polygons.svg'}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[225%] max-w-none aspect-square -z-10"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] sm:w-[225%] max-w-none aspect-square -z-10"
           />
 
           <h1 className="text-white text-3xl font-bold text-center mb-4">

@@ -11,19 +11,19 @@ import Main from './pages/Main';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
-import EnterQuiz from './pages/EnterQuiz';
-import HostLobby from './pages/HostLobby';
-import QuizPage from "./pages/QuizPage";
-import HostPage from "./pages/HostPage";
+import UserSettings from './pages/UserSettings';
+import Quizzes from './pages/Quizzes';
 
 function App() {
-    return (
-    <div className="relative overflow-hidden">
+  return (
+    <div className="relative overflow-hidden min-h-screen">
       <Header />
       <Route path="/" component={Main}/>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/my-account" component={MyAccount} />
+      <Route path="/my-account/settings" component={UserSettings} />
+      <Route path="/quizzes" component={Quizzes} />
       <ToastContainer theme="dark" />
     </div>
   );

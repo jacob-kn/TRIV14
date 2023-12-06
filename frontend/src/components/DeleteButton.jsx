@@ -4,7 +4,14 @@ import IconButton from './IconButton';
 
 import { TrashIcon } from '@heroicons/react/24/outline';
 
-const DeleteButton = ({ message, onConfirm, anchor, className }) => {
+const DeleteButton = ({
+  type,
+  message,
+  onConfirm,
+  anchor,
+  className,
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
 
@@ -34,9 +41,20 @@ const DeleteButton = ({ message, onConfirm, anchor, className }) => {
   return (
     <div className={className}>
       <div className="relative inline-block" ref={popoverRef}>
-        <IconButton type="secondary" onClick={() => setIsOpen(true)}>
-          <TrashIcon className="w-6 h-6" />
-        </IconButton>
+        {type === 'button' ? (
+          <Button
+            type="secondary"
+            onClick={() => setIsOpen(true)}
+            className="bg-red-800"
+          >
+            <TrashIcon className="w-6 h-6" />
+            {children}
+          </Button>
+        ) : (
+          <IconButton type="secondary" onClick={() => setIsOpen(true)}>
+            <TrashIcon className="w-6 h-6" />
+          </IconButton>
+        )}
         {isOpen && (
           <div
             className={`absolute flex flex-col gap-2 p-4 justify-center items-center z-50 mt-2 bg-surface border border-haiti rounded-md shadow-lg ${position}`}
