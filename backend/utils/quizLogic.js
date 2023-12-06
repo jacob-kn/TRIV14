@@ -23,7 +23,7 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
             setTimeout(() => {
                 const correctOption = fullQuestion.options.find(option => option.isCorrect);
                 io.to(roomCode).emit('correctAnswer', correctOption.text); // Emit only the text of the correct option
-            }, duration * 1000);
+            }, duration * 1000 + 1000);
 
         } else {
             // End of the quiz
