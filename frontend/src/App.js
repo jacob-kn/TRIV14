@@ -1,5 +1,4 @@
 import React from 'react';
-import { SocketProvider } from './socket';
 import { Route } from 'wouter';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,16 +18,14 @@ import HostPage from "./pages/HostPage";
 
 function App() {
     return (
-    <SocketProvider>
-      <div className="relative overflow-hidden">
-        <Header />
-        <Route path="/" component={Main}/>
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/my-account" component={MyAccount} />
-        <ToastContainer theme="dark" />
-      </div>
-    </SocketProvider>
+    <div className="relative overflow-hidden">
+      <Header />
+      <Route path="/" component={Main}/>
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/my-account" component={MyAccount} />
+      <ToastContainer theme="dark" />
+    </div>
   );
 }
 

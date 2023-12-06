@@ -5,11 +5,26 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import BgFlourish from "../components/BgFlourish";
+import { socket } from '../socket';
 
 function Main() {
   const [code, setCode] = useState("");
-
   const dispatch = useDispatch();
+
+  const enterRoom = () => {
+    if(socket){
+      socket.emit('checkRoom', code);
+    }else {
+      console.log(socket);
+    }
+  }
+
+  useEffect(() => {
+    if (socket) {
+        console.log('Socket is now available in Main.');
+        // You can set up socket event listeners here
+    }else {console.log('unavailable');}
+  }, [socket]);
 
   const onChange = (e) => {
     setCode(e.target.value);
@@ -35,7 +50,7 @@ function Main() {
                 placeholder="Room code"
                 onChange={onChange}
               />
-              <Button type="primary" className="shadow-lg">
+              <Button type="primary" className="shadow-lg" onClick={() => {enterRoom()}}>
                 Enter
               </Button>
             </div>
