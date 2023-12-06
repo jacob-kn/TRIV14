@@ -32,8 +32,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     getUserQuizzes: builder.query({
       // gets an array of quiz ids owned by the user
-      query: () => ({
-        url: `${USERS_URL}/quizzes`,
+      query: (page = 1) => ({
+        url: `${USERS_URL}/quizzes?page=${page}`,
         method: 'GET',
       }),
       providesTags: [{ type: 'Quiz', id: 'USER' }],

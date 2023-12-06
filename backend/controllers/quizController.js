@@ -4,14 +4,71 @@ import User from '../models/userModel.js';
 
 /**
  * @desc get public quizzes
- * @route GET /api/quizzes
+ * @route GET /api/quizzes?page&sort&filter
  * @access public
  */
 const getQuizzes = asyncHandler(async (req, res) => {
-  const quizzes = await Quiz.find({ isPublic: true }).select('_id');
+  const page = req.query.page || 1;
+  const sort = req.query.sort || '-createdAt';
+  const filter = req.query.filter || '';
+
+  if (page < 1) {
+    res.status(400);
+    throw new Error('Page number must be greater than 0');
+  }
+
+  if (!['-createdAt', 'createdAt', '-plays', 'plays'].includes(sort)) {
+    res.status(400);
+    throw new Error('Invalid sort parameter');
+  }
+
+  const tags = [
+    'Math',
+    'Science',
+    'History',
+    'Geography',
+    'Literature',
+    'Pop Culture',
+    'Other',
+  ];
+  const filters = filter.split(',').filter(Boolean); // Remove empty strings from filters array
+
+  if (filter && !filters.every((filter) => tags.includes(filter))) {
+    res.status(400);
+    throw new Error('Invalid filter parameter');
+  }
+
+  const pageSize = 12;
+  const startIndex = (page - 1) * pageSize;
+
+  const query = { isPublic: true };
+  if (filters.length > 0) {
+    query.tags = { $in: filters };
+  }
+
+  const count = await Quiz.countDocuments(query);
+
+  if (count !== 0 && startIndex >= count) {
+    res.status(400);
+    throw new Error(`Page number exceeds number of quizzes`);
+  }
+
+  const quizzes = await Quiz.find(query)
+    .sort(sort)
+    .skip(startIndex)
+    .limit(pageSize);
+
+  if (!quizzes) {
+    res.status(404);
+    throw new Error('Quizzes not found');
+  }
 
   const flattenedQuizzes = quizzes.map((quiz) => quiz._id);
-  res.json(flattenedQuizzes);
+  const totalPages = Math.ceil(count / pageSize);
+  res.status(200).json({
+    quizzes: flattenedQuizzes,
+    totalPages,
+  });
 });
 
 /**
@@ -82,7 +139,19 @@ const removeQuiz = asyncHandler(async (req, res) => {
     throw new Error('Quiz ID could not be found in request parameters');
   }
 
-  await Quiz.findByIdAndDelete(req.params.id);
+  const quiz = await Quiz.findById(req.params.id);
+
+  if (!quiz) {
+    res.status(404);
+    throw new Error('Quiz not found');
+  }
+
+  if (quiz.creator.toString() !== req.user._id.toString()) {
+    res.status(401);
+    throw new Error('User not authorized to delete this quiz');
+  }
+
+  await quiz.remove();
 
   const user = await User.findByIdAndUpdate(req.user._id, {
     $pull: { quizzes: req.params.id },
@@ -113,20 +182,29 @@ const updateQuiz = asyncHandler(async (req, res) => {
 
   const quiz = await Quiz.findById(req.params.id);
 
-  let publicationChange = false;
-  if (quiz) {
-    quiz.title = title || quiz.title;
-    quiz.description = description || quiz.description;
-    quiz.tags = tags || quiz.tags;
-    quiz.questions = questions || quiz.questions;
-
-    if (isPublic !== undefined && isPublic !== quiz.isPublic) {
-      quiz.isPublic = isPublic;
-      publicationChange = true;
-    }
-
-    await quiz.save();
+  if (!quiz) {
+    res.status(404);
+    throw new Error('Quiz not found');
   }
+
+  if (quiz.creator.toString() !== req.user._id.toString()) {
+    res.status(401);
+    throw new Error('User not authorized to edit this quiz');
+  }
+
+  let publicationChange = false;
+
+  quiz.title = title || quiz.title;
+  quiz.description = description || quiz.description;
+  quiz.tags = tags || quiz.tags;
+  quiz.questions = questions || quiz.questions;
+
+  if (isPublic !== undefined && isPublic !== quiz.isPublic) {
+    quiz.isPublic = isPublic;
+    publicationChange = true;
+  }
+
+  await quiz.save();
 
   res.json({
     publicationChange,
