@@ -30,7 +30,6 @@ function App() {
       <Route path="/play/:roomCode" component={QuizPage} />
 
       <Route path="/enter-quiz" component={EnterQuiz} />
-      <Route path="/host-lobby" component={HostLobby} />
       
       <ToastContainer theme="dark" />
     </div>

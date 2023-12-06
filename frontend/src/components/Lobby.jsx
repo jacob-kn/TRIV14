@@ -2,7 +2,6 @@ import BgFlourish from "./BgFlourish";
 import Spinner from "./Spinner";
 
 export default function Lobby({ players }) {
-
   return (
     <div className="min-h-fit pt-8 pb-16 mb-8">
       <BgFlourish className="min-h-screen" flourish="3" />
@@ -26,9 +25,7 @@ export default function Lobby({ players }) {
             <div className="self-center">
               <Spinner />
             </div>
-            
           )}
-
         </div>
       </div>
     </div>

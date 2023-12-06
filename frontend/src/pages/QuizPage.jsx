@@ -28,7 +28,7 @@ export default function QuizPage() {
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
 
   // initial: false, changes to true when start quiz event is fired
-  let isStarted = true;
+  let isStarted = false;
 
   // either given by host or incremented by some event (next question event)
   let questionIndex = 1;
@@ -37,7 +37,7 @@ export default function QuizPage() {
   let isComplete = false;
 
   // time remaining
-  const timeRemaining = 10;
+  const timeRemaining = 60;
 
   // score
   let score = 1234;

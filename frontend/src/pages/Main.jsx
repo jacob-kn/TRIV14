@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'wouter';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import BgFlourish from '../components/BgFlourish';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "wouter";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import BgFlourish from "../components/BgFlourish";
 
 function Main() {
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState("");
 
   const dispatch = useDispatch();
 
@@ -21,7 +21,7 @@ function Main() {
       <div className="flex gap-16 items-center justify-center px-12 pb-24">
         <div className="relative w-2/3 max-w-3xl">
           <img
-            src={process.env.PUBLIC_URL + '/flourishes/join-polygons.svg'}
+            src={process.env.PUBLIC_URL + "/flourishes/join-polygons.svg"}
             className="w-full -z-10"
           />
           <div className="w-1/2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3">
@@ -53,7 +53,11 @@ function Main() {
             </Button>
           </Link>
           <Link to="/quizzes">
-            <Button type="secondary" className="w-full whitespace-normal">
+            <Button
+              type="secondary"
+              className="w-full whitespace-normal"
+              onClick={() => {}}
+            >
               Explore quizzes
               <ArrowRightIcon className="w-6 h-6" />
             </Button>
