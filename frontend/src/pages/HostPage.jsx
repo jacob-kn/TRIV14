@@ -18,7 +18,7 @@ export default function HostPage() {
   const [players, setPlayers] = useState([]);
   const currentQuizId = useSelector(selectQuizId);
   const { roomCode } = useParams();
-  const duration = 60;
+  const duration = 15;
   const [startCountdown, setStartCountdown] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState();
   const [isStarted, setIsStarted] = useState(false);
@@ -43,81 +43,22 @@ export default function HostPage() {
 
   // updated when the host tries to go to the next question after the last
 
-  // time remaining
-  let timeRemaining = 60;
-
   // details for the winner
-
-  // temp for testing
-  const quiz = {
-    title: "This is a custom title",
-    questions: [
-      {
-        type: "Multiple Choice",
-        question: "What geometric shapes is generally used for stop signs?",
-        options: [
-          {
-            text: "Circle",
-          },
-          {
-            text: "Octagon",
-          },
-          {
-            text: "Rectangle",
-          },
-          {
-            text: "Triangle",
-          },
-        ],
-      },
-      {
-        type: "fitb",
-        question: "Guess the animal!",
-        options: [
-          {
-            text: "The quick brown _ jumps over the lazy dog.",
-          },
-        ],
-      },
-      {
-        type: "Multiple Choice",
-        question: "What geometric shapes is generally used for stop signs?",
-        options: [
-          {
-            text: "Answer1",
-          },
-          {
-            text: "Answer2",
-          },
-          {
-            text: "Answer3",
-          },
-          {
-            text: "Answer4",
-          },
-        ],
-      },
-    ],
-  };
 
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
       console.log(playerArray);
       setPlayers(playerArray);
-
-      console.log("Store current quiz Id: " + currentQuizId);
     });
 
     socket.on("newQuestion", (questionObject) => {
-      console.log("Received question object.");
-      // setQuizQuestion(questionObject);
-      console.log(questionObject);
       setQuizQuestion(questionObject);
       setStartCountdown(true);
       setIsStarted(true);
     });
 
     socket.on('correctAnswer', (correctOption) => {
+      setStartCountdown(false);
       console.log("Question time is up!\n" + "Correction option: " + correctOption);
     })
 
@@ -132,16 +73,11 @@ export default function HostPage() {
   }, [socket]);
 
   const handleCountdownEnd = () => {
-    console.log("Time is up!");
-    setStartCountdown(false);
+    // setStartCountdown(false);
   };
 
   const handleStartQuiz = () => {
     console.log("Starting the quiz.");
-    console.log(quiz1);
-    console.log(quiz1.questions.length);
-    console.log(roomCode);
-    console.log(duration);
     socket.emit("startQuiz", quiz1, roomCode, duration);
   };
 
@@ -152,7 +88,6 @@ export default function HostPage() {
   if (isLoadingUser) {
     return <Spinner />;
   } else {
-    // console.log(user.username);
   }
 
   if (!isStarted) {
@@ -187,8 +122,8 @@ export default function HostPage() {
           </h1>
         </div>
         <CountdownBar
-          totalSeconds={timeRemaining}
-          onCountdownEnd={handleCountdownEnd}
+          totalSeconds={duration}
+          // onCountdownEnd={handleCountdownEnd}
           startCountdown={startCountdown}
         />
 
@@ -230,9 +165,7 @@ export default function HostPage() {
                   </>
                 ) : (
                   <>
-                    {" "}
                     {quizQuestion.map((option, index) => {
-                      // console.log("options index: " + index + ", text: " + option.text);
                       return (
                         <FillInTheBlank
                           key={index}

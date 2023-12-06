@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const CountdownBar = ({ totalSeconds, onCountdownEnd, startCountdown }) => {
   const [secondsRemaining, setSecondsRemaining] = useState(totalSeconds);
-
+  
   useEffect(() => {
     let intervalId;
 
@@ -21,7 +21,7 @@ const CountdownBar = ({ totalSeconds, onCountdownEnd, startCountdown }) => {
             if (onCountdownEnd) {
               onCountdownEnd();
             }
-            return prevSeconds;
+            return 0;
           }
         });
       }, 1000);

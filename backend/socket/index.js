@@ -14,24 +14,19 @@ const setupWebSocket = (io) => {
         socket.on('checkRoom', (roomCode) => {
             console.log("checkRoom (backend): " + roomCode);
             if(io.sockets.adapter.rooms.has(roomCode)){ // making sure the room exists
-                console.log("do we emit valid room ?");
                 socket.emit('validRoom', roomCode);
             } else {
-                console.log("room doesn't exist");
                 socket.emit('invalidRoom', roomCode);
             }
         })
         socket.on('joinRoom', (roomCode, username) => {
-            console.log("joinRoom");
             if(io.sockets.adapter.rooms.has(roomCode)){ // making sure the room exists before joining
-                console.log("inside if join room");
                 socket.join(roomCode); // Putting the client into the room
                 const usersInRoom = roomData.get(roomCode);
                 usersInRoom.set(socket.id, username);
                 io.to(roomCode).emit('updatedUserList', Array.from(usersInRoom.values())); // sending client a list of all users in room
                 currentRoomId = roomCode;
             } else {
-                console.log("inside else join room");
                 socket.emit('invalidRoom', roomCode);
             }
         })
@@ -47,9 +42,6 @@ const setupWebSocket = (io) => {
         })
         
         socket.on('startQuiz', ( quiz, roomCode, duration) => { // quiz is literally the json object
-            console.log(quiz);
-            console.log(roomCode);
-            console.log(duration);
             startQuiz(io, quiz, roomCode, duration, socket.id);
         })
 
