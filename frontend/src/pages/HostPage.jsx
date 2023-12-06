@@ -5,16 +5,18 @@ import WinnerPage from "./WinnerPage";
 import { useParams } from "wouter";
 import { useGetUserQuery } from "../slices/auth/usersApiSlice";
 import HostLobby from "./HostLobby";
-import HostView from "../components/HostView";
 import BgFlourish from "../components/BgFlourish";
 import CountdownBar from "../components/CountDownTimer";
-import MultipleChoice from "../components/MultipleChoice";
-import FillInTheBlanks from "../components/FillInTheBlanks";
 import Button from "../components/Button";
 import { socket } from "../socket";
+import { useSelector } from "react-redux";
+import { selectQuizId } from '../slices/quizSlice';
 
-export default function QuizPage({ params }) {
+export default function HostPage() {
   const [players, setPlayers] = useState([]);
+
+  const currentQuizId = useSelector(selectQuizId);
+
   const [currentQuestion, setCurrentQuestion] = useState();
   const quizIds = [
     "65691706b7ef6d91783b40b3",
@@ -47,10 +49,12 @@ export default function QuizPage({ params }) {
     socket.on("updatedUserList", (playerArray) => {
       console.log(playerArray);
       setPlayers(playerArray);
+      
+      console.log("Store current quiz Id: " + currentQuizId);
     });
 
     return () => {
-      socket.off("someEvent");
+      socket.off("someEvent", () => {});
     };
   }, [socket]);
 
@@ -128,7 +132,7 @@ export default function QuizPage({ params }) {
   if (isLoadingUser) {
     return <Spinner />;
   } else {
-    console.log(user.username);
+    // console.log(user.username);
   }
 
   if (!isStarted) {

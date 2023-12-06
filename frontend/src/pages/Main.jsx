@@ -6,10 +6,31 @@ import Button from "../components/Button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import BgFlourish from "../components/BgFlourish";
 import { socket } from '../socket';
+import { navigate } from 'wouter/use-location';
 
 function Main() {
   const [code, setCode] = useState("");
   const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    console.log("Main");
+    if (socket) {
+        // You can set up socket event listeners here
+        socket.on('validRoom', (roomCode) => {
+          console.log("Room " + roomCode + " exists.");
+          // if (logged in) {
+          //   navigate("/play/" + roomCode);
+          // } else {}
+          // socket.emit('joinRoom', roomCode, "Alice");
+          // else go to the page 
+          navigate("/" + roomCode);
+        })
+
+        return () => {
+          socket.off("someEvent", () => {});
+        };
+    }else {console.log('unavailable');}
+  }, [socket]);
 
   const enterRoom = () => {
     console.log("Checking if room exists.");
@@ -20,24 +41,8 @@ function Main() {
     }
   }
 
-  useEffect(() => {
-    console.log("Main");
-    if (socket) {
-        // You can set up socket event listeners here
-        socket.on('validRoom', (roomCode) => {
-          console.log(roomCode + " room exists.");
-          socket.emit('joinRoom', code, "Alice");
-        })
-
-        return () => {
-          socket.off("someEvent");
-        };
-    }else {console.log('unavailable');}
-  }, [socket]);
-
   const onChange = (e) => {
-    // console.log(typeof e.target.value);
-    setCode(e.target.value);
+    setCode((e.target.value).toString());
   };
 
   return (

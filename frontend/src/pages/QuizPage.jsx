@@ -9,6 +9,7 @@ import Lobby from "../components/Lobby";
 import WinnerPage from "./WinnerPage";
 import { useParams } from "wouter";
 import { useGetUserQuery } from "../slices/auth/usersApiSlice";
+import { socket } from "../socket";
 
 export default function QuizPage() {
   const { roomCode } = useParams();
@@ -148,15 +149,27 @@ export default function QuizPage() {
   ];
 
   // replace with actual array of players from backend (through sockets)
-  const [players, setPlayers] = useState([
-    "Alice",
-    "Bob",
-    "Charlie",
-    "Eve",
-    "Xander",
-    "Yvonne",
-    "Zane",
-  ]);
+  const [players, setPlayers] = useState([]);
+  //   "Alice",
+  //   "Bob",
+  //   "Charlie",
+  //   "Eve",
+  //   "Xander",
+  //   "Yvonne",
+  //   "Zane",
+  // ]);
+
+  useEffect(() => {
+    socket.on("updatedUserList", (playerArray) => {
+      console.log(playerArray);
+      setPlayers(playerArray);
+      
+    });
+
+    return () => {
+      socket.off("someEvent", () => {});
+    };
+  }, [socket]);
 
   const handleCountdownEnd = () => {
     setIsClickable(false);

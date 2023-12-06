@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'wouter';
+import { useSelector, useDispatch } from 'react-redux'
+import { navigate } from 'wouter/use-location';
+import { socket } from '../socket';
 
 import {
   useGetQuizQuery,
@@ -16,12 +19,13 @@ import {
 import Button from './Button';
 import IconButton from './IconButton';
 import DeleteButton from './DeleteButton';
-import { navigate } from 'wouter/use-location';
-import { socket } from '../socket';
+import { setQuizId, setQuizRoomCode, selectQuizRoomCode } from '../slices/quizSlice';
+
 
 const QuizCard = ({ quizId, isOwned }) => {
-  const roomCode = 1;
-  // Math.floor(Math.random() * (10000 - 1 + 1)) + 1;
+  const dispatch = useDispatch();
+  const roomCode = useSelector(selectQuizRoomCode);
+
   const {
     data: quiz,
     isLoading,
@@ -33,13 +37,12 @@ const QuizCard = ({ quizId, isOwned }) => {
   const [updateQuiz] = useUpdateQuizMutation();
 
   useEffect(() => {
-    socket.on('roomCreated', () => {
-      // at this point the room code is different
-      navigate("/host/" + roomCode + "/" + quizId);
+    socket.on('roomCreated', (createdRoomCode) => {
+      navigate("/host/" + createdRoomCode);
     });
 
     return () => {
-        socket.off('someEvent');
+        socket.off('someEvent', () => {});
     }; 
   }, [socket])
 
@@ -126,12 +129,17 @@ const QuizCard = ({ quizId, isOwned }) => {
           Plays: {quiz.plays}
         </span>
       </div>
+
+
       <Button onClick={() => {
-        console.log("Random room code (frontend): " + roomCode);
-        socket.emit('createQuiz', roomCode.toString().trim()); // Todo - not handling roomAlreadyExists
+        console.log(quizId);
+        dispatch(setQuizId(quizId));
+        socket.emit('createQuiz', (Math.floor(Math.random() * (10000 - 1 + 1)) + 1).toString()); // ToDo - not handling roomAlreadyExists
       }}>
         Host
       </Button>
+
+
       {isOwned && (
         <>
           <DeleteButton
