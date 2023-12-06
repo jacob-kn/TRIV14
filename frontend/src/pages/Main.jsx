@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "wouter";
 import Input from "../components/Input";
@@ -12,6 +12,7 @@ function Main() {
   const { userInfo } = useSelector((state) => state.auth);
 
   const enterRoom = () => {
+    console.log("Checking if room exists.");
     if(socket){
       socket.emit('checkRoom', code);
     }else {
@@ -20,13 +21,22 @@ function Main() {
   }
 
   useEffect(() => {
+    console.log("Main");
     if (socket) {
-        console.log('Socket is now available in Main.');
         // You can set up socket event listeners here
+        socket.on('validRoom', (roomCode) => {
+          console.log(roomCode + " room exists.");
+          socket.emit('joinRoom', code, "Alice");
+        })
+
+        return () => {
+          socket.off("someEvent");
+        };
     }else {console.log('unavailable');}
   }, [socket]);
 
   const onChange = (e) => {
+    // console.log(typeof e.target.value);
     setCode(e.target.value);
   };
 
@@ -52,7 +62,9 @@ function Main() {
                 placeholder="Room code"
                 onChange={onChange}
               />
-              <Button type="primary" className="shadow-lg" onClick={() => {enterRoom()}}>
+              <Button type="primary" className="shadow-lg" onClick={() => {
+                console.log("Button clicked");
+                enterRoom()}}>
                 Enter
               </Button>
             </div>

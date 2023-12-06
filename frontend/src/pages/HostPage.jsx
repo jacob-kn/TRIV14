@@ -11,11 +11,11 @@ import CountdownBar from "../components/CountDownTimer";
 import MultipleChoice from "../components/MultipleChoice";
 import FillInTheBlanks from "../components/FillInTheBlanks";
 import Button from "../components/Button";
+import { socket } from "../socket";
 
-export default function QuizPage() {
-  const { roomCode } = useParams();
+export default function QuizPage({ params }) {
+  const [players, setPlayers] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState();
-
   const quizIds = [
     "65691706b7ef6d91783b40b3",
     "6569172db7ef6d91783b40b7",
@@ -23,12 +23,14 @@ export default function QuizPage() {
     "656b7e516b12c29574edc587",
   ];
 
+  // console.log(params);
+
   // use quiz id after joining a room to query and get
   const { data: quiz1, isLoading } = useGetQuizQuery(quizIds[3]);
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
 
   // initial: false, changes to true when start quiz event is fired
-  let isStarted = true;
+  let isStarted = false;
 
   // either given by host or incremented by some event (next question event)
   let questionIndex = 0;
@@ -41,7 +43,16 @@ export default function QuizPage() {
 
   // details for the winner
 
-  // temp for testing
+  useEffect(() => {
+    socket.on("updatedUserList", (playerArray) => {
+      console.log(playerArray);
+      setPlayers(playerArray);
+    });
+
+    return () => {
+      socket.off("someEvent");
+    };
+  }, [socket]);
 
   // temp for testing
   const quiz = {
@@ -96,15 +107,15 @@ export default function QuizPage() {
   };
 
   // replace with actual array of players from backend (through sockets)
-  const [players, setPlayers] = useState([
-    "Alice",
-    "Bob",
-    "Charlie",
-    "Eve",
-    "Xander",
-    "Yvonne",
-    "Zane",
-  ]);
+  // const [players, setPlayers] = useState([
+  //   "Alice",
+  //   "Bob",
+  //   "Charlie",
+  //   "Eve",
+  //   "Xander",
+  //   "Yvonne",
+  //   "Zane",
+  // ]);
 
   const handleCountdownEnd = () => {
     console.log("Time is up!");
@@ -173,11 +184,11 @@ export default function QuizPage() {
               <>
                 {quiz.questions[questionIndex].type === "Multiple Choice" ? (
                   <></>
+                ) : (
                   // <MultipleChoice
                   //   options={quiz.questions[questionIndex].options}
                   //   isClickable={false}
                   // />
-                ) : (
                   <></>
                   // <FillInTheBlanks
                   //   options={quiz.questions[questionIndex].options}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'wouter';
 
@@ -16,8 +16,12 @@ import {
 import Button from './Button';
 import IconButton from './IconButton';
 import DeleteButton from './DeleteButton';
+import { navigate } from 'wouter/use-location';
+import { socket } from '../socket';
 
 const QuizCard = ({ quizId, isOwned }) => {
+  const roomCode = 1;
+  // Math.floor(Math.random() * (10000 - 1 + 1)) + 1;
   const {
     data: quiz,
     isLoading,
@@ -27,6 +31,17 @@ const QuizCard = ({ quizId, isOwned }) => {
   } = useGetQuizQuery(quizId);
   const [removeQuiz] = useRemoveQuizMutation();
   const [updateQuiz] = useUpdateQuizMutation();
+
+  useEffect(() => {
+    socket.on('roomCreated', () => {
+      // at this point the room code is different
+      navigate("/host/" + roomCode + "/" + quizId);
+    });
+
+    return () => {
+        socket.off('someEvent');
+    }; 
+  }, [socket])
 
   const handleDelete = async () => {
     try {
@@ -111,6 +126,12 @@ const QuizCard = ({ quizId, isOwned }) => {
           Plays: {quiz.plays}
         </span>
       </div>
+      <Button onClick={() => {
+        console.log("Random room code (frontend): " + roomCode);
+        socket.emit('createQuiz', roomCode.toString().trim()); // Todo - not handling roomAlreadyExists
+      }}>
+        Host
+      </Button>
       {isOwned && (
         <>
           <DeleteButton

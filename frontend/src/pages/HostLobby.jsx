@@ -30,7 +30,7 @@ export default function HostLobby({ players }) {
           </div>
         </div>
         <p className="text-white text-1xl mb-4 px-4 text-center">
-          Players: {players.length}/20
+          Players: {players.length}
         </p>
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start w-1/3">
           {players ? (

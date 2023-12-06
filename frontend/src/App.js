@@ -13,6 +13,8 @@ import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
 import UserSettings from './pages/UserSettings';
 import Quizzes from './pages/Quizzes';
+import HostPage from "./pages/HostPage"
+import QuizPage from "./pages/QuizPage"
 
 function App() {
   return (
@@ -24,6 +26,13 @@ function App() {
       <Route path="/my-account" component={MyAccount} />
       <Route path="/my-account/settings" component={UserSettings} />
       <Route path="/quizzes" component={Quizzes} />
+      <Route path="/host/:roomCode/:quizId">
+        {(params) => (
+          <HostPage params={params} />
+        )}
+      </Route>
+      {/* <Route path="/host/:roomCode/:quizId" {(params) => (<HostPage params={params}/>)} /> */}
+      <Route path="/play/:roomCode" component={QuizPage} />
       <ToastContainer theme="dark" />
     </div>
   );

@@ -31,7 +31,7 @@ export default function QuizPage() {
   let isStarted = false;
 
   // either given by host or incremented by some event (next question event)
-  let questionIndex = 1;
+  let questionIndex = 0;
 
   // updated when the host tries to go to the next question after the last
   let isComplete = false;
