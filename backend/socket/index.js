@@ -3,11 +3,13 @@ const roomData = new Map();
 
 const setupWebSocket = (io) => {
     io.on('connection', (socket) => {
-        console.log('A user connected: ', socket.id); // Just for Testing
-        socket.on('disconnect', () => { 
-            console.log('User disconnected');
-        });
-
+        var currentRoomId;
+        socket.on('disconnect', () => {
+                const usersInRoom = roomData.get(currentRoomId);
+                usersInRoom.delete(socket.id);
+                io.to(currentRoomId).emit('updatedUserList', Array.from(usersInRoom.values()));
+        })
+        
         // Event Listeners
         socket.on('checkRoom', (roomCode) => {
             console.log("checkRoom (backend): " + roomCode);
@@ -27,6 +29,7 @@ const setupWebSocket = (io) => {
                 const usersInRoom = roomData.get(roomCode);
                 usersInRoom.set(socket.id, username);
                 io.to(roomCode).emit('updatedUserList', Array.from(usersInRoom.values())); // sending client a list of all users in room
+                currentRoomId = roomCode;
             } else {
                 console.log("inside else join room");
                 socket.emit('invalidRoom', roomCode);
