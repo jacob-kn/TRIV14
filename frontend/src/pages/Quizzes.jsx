@@ -56,7 +56,7 @@ function Quizzes() {
     <>
       <BgFlourish flourish="3" />
 
-      <div className="mx-4 my-8 sm:mx-20">
+      <div className="mx-4 my-8 sm:mx-20 flex flex-col items-stretch">
         <div className="flex flex-col items-center gap-4 my-8">
           <h1 className="text-white text-3xl font-bold text-center">
             Community Quizzes
@@ -144,38 +144,38 @@ function Quizzes() {
               <option value="plays">Least Plays</option>
             </select>
           </div>
-        </div>
 
-        {isLoading || isFetching ? (
-          <Spinner />
-        ) : isError ? (
-          <div className="flex justify-center">
-            <h3 className="text-gray-200 flex gap-2">
-              <ExclamationCircleIcon className="w-6 h-6" />
-              Could not load quizzes. Please try again later.
-            </h3>
-          </div>
-        ) : !quizzes.length ? (
-          <div className="flex justify-center">
-            <h3 className="text-gray-200">
-              There are no quizzes for the selected criteria.
-            </h3>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap justify-center gap-8 max-w-[1500px]">
-              {quizzes.map((quizId) => (
-                <QuizCard key={quizId} quizId={quizId} />
-              ))}
+          {isLoading || isFetching ? (
+            <Spinner />
+          ) : isError ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200 flex gap-2">
+                <ExclamationCircleIcon className="w-6 h-6" />
+                Could not load quizzes. Please try again later.
+              </h3>
             </div>
+          ) : !quizzes.length ? (
+            <div className="flex justify-center">
+              <h3 className="text-gray-200">
+                There are no quizzes for the selected criteria.
+              </h3>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-center gap-8 max-w-[1500px]">
+                {quizzes.map((quizId) => (
+                  <QuizCard key={quizId} quizId={quizId} />
+                ))}
+              </div>
 
-            <Pagination
-              totalPages={totalPages}
-              currentPage={page}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+              <Pagination
+                totalPages={totalPages}
+                currentPage={page}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+        </div>
       </div>
     </>
   );
