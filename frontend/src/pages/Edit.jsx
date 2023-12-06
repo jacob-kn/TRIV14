@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGetQuizQuery } from '../slices/quizzesApiSlice';
 import { Link, useLocation, useParams } from 'wouter';
 import Loader from '../components/Loader';
@@ -14,22 +14,27 @@ function Edit() {
   
 
   const defaultQuestion = {
-    content: '',
-    type: 'multipleChoice',
-    answers: [{ text: 'a', correct: false }, { text: 'b', correct: false }, { text: 'c', correct: false }, { text: 'd', correct: false }],
+    question: '',
+    type: 'Multiple Choice',
+    options: [{ text: 'a', isCorrect: true }, { text: 'b', isCorrect: true }, { text: 'c', isCorrect: true }, { text: 'd', isCorrect: true }],
   };
 
-  const [currentQuestions, setCurrentQuestions] = useState(quiz?.questions ? quiz.questions : [defaultQuestion]);
+  const [title, setTitle] = useState(quiz?.title || '');
+  const [description, setDescription] = useState(quiz?.description || '')
+  const [currentQuestions, setCurrentQuestions] = useState(quiz?.questions || [defaultQuestion]);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const [answerCount, setAnswerCount] = useState(4);
   
   
-  const [questionType, setQuestionType] = useState(quiz ? (quiz.questions[currentQuestionIndex]?.type || 'multipleChoice') : 'multipleChoice');
+  
+  const [questionType, setQuestionType] = useState(quiz ? (quiz.questions[currentQuestionIndex]?.type || 'Multiple Choice') : 'Multiple Choice');
   const [questionContent, setQuestionContent] = useState(quiz?.questions[currentQuestionIndex]?.question || '');
-  const [currentAnswers, setCurrentAnswers] = useState(new Array(answerCount).fill({ text: 'answer', correct: false }));
 
+  //should be dynamic
+  const [currentAnswers, setCurrentAnswers] = useState([{ text: quiz?.questions[currentQuestionIndex]?.options[0].text, isCorrect: quiz?.questions[currentQuestionIndex]?.options[0].isCorrect }]
+    || [{ text: 'a', isCorrect: true }, { text: 'b', isCorrect: true }, { text: 'c', isCorrect: true }, { text: 'd', isCorrect: true }]);
+  const [answerCount, setAnswerCount] = useState(currentAnswers.length);
   
   const changeQuestion = (index) => {
     if (index !== currentQuestionIndex) {
@@ -39,8 +44,8 @@ function Edit() {
           return {
             ...question,
             type: questionType,
-            content: questionContent,
-            answers: currentAnswers
+            question: questionContent,
+            options: currentAnswers
           };
         }
         return question;
@@ -52,12 +57,22 @@ function Edit() {
       // Retrieve the state for the selected question
       const selectedQuestion = updatedQuestions[index];
       setQuestionType(selectedQuestion.type);
-      setQuestionContent(selectedQuestion.content);
-      setCurrentAnswers(selectedQuestion.answers);
+      setQuestionContent(selectedQuestion.question);
+      setCurrentAnswers(selectedQuestion.options);
       setCurrentQuestions(updatedQuestions);
-      setAnswerCount(selectedQuestion.answers.length);
+      setAnswerCount(selectedQuestion.options.length);
       
     }
+  }
+
+  const handleTitleTextChange = (e) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+  };
+
+  const handleDescriptionTextChange = (e) => {
+    const newDesc = e.target.value;
+    setDescription(newDesc);
   }
 
   const addQuestion = () => {
@@ -80,24 +95,24 @@ function Edit() {
   const handleQuestionTypeChange = (event) => {
     setQuestionType(event.target.value); // Update the question type based on dropdown selection
     // Adjust answers if switching from short answer to multiple choice
-    if (event.target.value === 'multipleChoice' && answerCount > 4) {
+    if (event.target.value === 'Multiple Choice' && answerCount > 4) {
       setAnswerCount(4);
     }
-    if (event.target.value === 'multipleChoice' && answerCount < 2) {
+    if (event.target.value === 'Multiple Choice' && answerCount < 2) {
       setAnswerCount(2);
     }
   };
 
   const addAnswer = () => {
-    if ((questionType === 'shortAnswer' && answerCount < 100) || (questionType === 'multipleChoice' && answerCount < 4)) {
-      const newAnswer = { text: '', correct: false }; // Create a new empty answer object
+    if ((questionType === 'Short Answer' && answerCount < 100) || (questionType === 'Multiple Choice' && answerCount < 4)) {
+      const newAnswer = { text: '', isCorrect: true }; // Create a new empty answer object
       setCurrentAnswers(prevAnswers => [...prevAnswers, newAnswer]); // Add the new answer to the currentAnswers state
       setAnswerCount(answerCount + 1);
     }
   };
 
   const removeAnswer = (index) => {
-    if ((questionType === 'shortAnswer' && answerCount > 1) || (questionType === 'multipleChoice' && answerCount > 2)) {
+    if ((questionType === 'Short Answer' && answerCount > 1) || (questionType === 'Multiple Choice' && answerCount > 2)) {
 
       
       const updatedAnswers = currentAnswers.filter((_, i) => i !== index); // Remove the corresponding question when its Delete button is clicked
@@ -114,8 +129,52 @@ function Edit() {
 
   const handleCorrectnessChange = (e, index) => {
     const updatedAnswers = [...currentAnswers];
-    updatedAnswers[index].correct = e.target.checked;
+    updatedAnswers[index].isCorrect = e.target.checked;
     setCurrentAnswers(updatedAnswers);
+  };
+  
+  const handleSaveQuiz = async () => {
+
+    changeQuestion(currentQuestionIndex);
+    try {
+
+      const checkboxes = document.querySelectorAll('#tagboxes input[type="checkbox"]:checked');
+      const tags = Array.from(checkboxes).map((checkbox) => checkbox.value);
+
+      const response = await fetch(`/api/quizzes/${quizId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          tags, // Include logic to gather tags data
+          isPublic: false, // Include logic to set isPublic flag
+          questions: currentQuestions,
+        }),
+      });
+
+      console.log(JSON.stringify({
+        title,
+        description,
+        tags, // Include logic to gather tags data
+        isPublic: false, // Include logic to set isPublic flag
+        questions: currentQuestions,
+      }))
+
+      if (response.ok) {
+        // Quiz saved successfully
+        // You might want to handle the success scenario here (e.g., show a success message)
+        console.log("response.ok");
+      } else {
+        // Handle the case where the server returns an error
+        // You can access the error response from `response` object if needed
+        console.log("not response.ok");
+      }
+    } catch (error) {
+      console.log("error caught");
+    }
   };
 
   if (isLoading) {
@@ -130,16 +189,18 @@ function Edit() {
     return <h1 className="text-white">No quiz data available</h1>;
   }
 
+  
+
   return (
     <div className="flex flex-row gap-9 ml-10">
         <BgFlourish flourish="3" />
         
-
+        {/* List of Questions */}
         <div className='w-1/12'>
         <ul className=" md:max-w-7xl rounded-md">
           {currentQuestions.map((question, index) => (
             <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full md:w-auto p-2 my-4 cursor-pointer" key={index}>
-              Question {index + 1}
+              Question {index + 1}: {question.type}
               <div className="flex flex-row justify-between">
                 <IconButton className="inline" type="secondary" onClick={() => changeQuestion(index)}>
                     <PencilSquareIcon className="w-6 h-6" />
@@ -156,10 +217,56 @@ function Edit() {
       </div>
 
 
-        
+      
 
         <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-4/5 mr-10">
+          <input
+            type="text"
+            id={`title`}
+            name={`title`}
+            value={title}
+            placeholder="Title"
+            className='text-black rounded-md p-1 mr-auto w-5/6'
+            onChange={(e) => handleTitleTextChange(e)}
+          />
+          <textarea 
+            value={description} 
+            onChange={(e) => handleDescriptionTextChange(e)} 
+            id="desc" 
+            name="desc" 
+            placeholder={`Description`} 
+            className="text-black w-full resize-none rounded-md">
+          </textarea>
+
+            <div id="tagboxes" className='flex flex-row gap-10 '>
+              <label>
+                <input type="checkbox" name="Math" value=" Math" />
+                Math
+              </label>
+              <label>
+                <input type="checkbox" name="Science" value=" Science" />
+                Science
+              </label>
+              <label>
+                <input type="checkbox" name="History" value=" History" />
+                History
+              </label>
+              <label>
+                <input type="checkbox" name="Literature" value=" Literature" />
+                Literature
+              </label>
+              <label>
+                <input type="checkbox" name="Geography" value=" Geography" />
+                Geography
+              </label>
+              <label>
+                <input type="checkbox" name="PopCulture" value=" Pop Culture" />
+                Pop Culture
+              </label>
+            </div>
+
             <h2 className="mr-auto">Question {currentQuestionIndex + 1}</h2>
+            
     
             {/* Dropdown for Question type */}
                 <div className="flex flex-col gap-2 mr-auto w-1/3 rounded-md">
@@ -171,19 +278,19 @@ function Edit() {
                     value={questionType}
                     onChange={handleQuestionTypeChange}
                 >
-                    <option value="multipleChoice">Multiple choice</option>
-                    <option value="shortAnswer">Short answer</option>
+                    <option value="Multiple Choice">Multiple choice</option>
+                    <option value="Short Answer">Short answer</option>
                 </select>
             </div>
     
             {/* Text field for Question */}
             <div className="flex flex-col gap-2 mr-auto w-full">
                 <label htmlFor="questionInput">Question</label>
-                <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" className="text-black h-20 resize-none rounded-md"></textarea>
+                <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" placeholder={`Enter question`} className="text-black h-20 resize-none rounded-md"></textarea>
             </div>
 
             {/*Render Multiple Choice */}
-            {questionType === 'multipleChoice' && (
+            {questionType === 'Multiple Choice' && (
             <div className='flex flex-row gap-4 w-full justify-between'>
                 {Array.from({ length: answerCount }).map((_, index) => (
                 
@@ -194,7 +301,7 @@ function Edit() {
                     </IconButton>
                     <input
                       type="checkbox"
-                      checked={currentAnswers[index]?.correct || false}
+                      checked={currentAnswers[index]?.isCorrect || false}
                       id={`checkbox${index + 1}`}
                       name={`checkbox${index + 1}`}
                       className='ml-auto mr-2'
@@ -205,19 +312,20 @@ function Edit() {
                       type="text"
                       id={`input${index + 1}`}
                       name={`input${index + 1}`}
+                      placeholder={`Answer ${index + 1}`}
                       className='text-black rounded-md p-1 m-3 w-5/6'
                       value={currentAnswers[index].text}
                       onChange={(e) => handleAnswerTextChange(e, index)}
                     />
                 </div>
                 ))}
-                {answerCount < 4 && <Button onClick={addAnswer}>+</Button>}
+                {answerCount < 4 && <Button onClick={(addAnswer)}>+</Button>}
             </div>              
             )}
             
 
             {/* Render text fields for short answers */}
-            {questionType === 'shortAnswer' && (
+            {questionType === 'Short Answer' && (
             <div className="flex flex-col gap-4 w-full justify-between">
                 {/* Render text fields for short answers */}
                 {Array.from({ length: answerCount }).map((_, index) => (
@@ -243,10 +351,12 @@ function Edit() {
         
             {/* Cancel & Delete Buttons */}
             <div className="grid grid-cols-4 gap-4 w-full">
-                <Button isSubmit type="tertiary" className="w-full">
-                Cancel
-                </Button>
-                <Button isSubmit type="secondary" className="w-full">
+                <Link to="/my-account">
+                  <Button isSubmit type="tertiary" className="w-full">
+                    Cancel
+                  </Button>
+                </Link>
+                <Button isSubmit type="secondary" className="w-full" onClick={handleSaveQuiz}>
                 Save Quiz
                 </Button>
             </div>

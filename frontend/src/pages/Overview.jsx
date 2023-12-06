@@ -36,10 +36,10 @@ function Overview() {
         
         <h2 className="mr-auto">Questions ({quiz.questions.length})</h2>
         
+
         <ul className="w-full md:max-w-7xl">
           {quiz.questions.map((question, index) => (
-            <li className="border border-surface-500 rounded-lg w-full md:w-auto p-2 my-4" key={index}>{question.text}</li>
-            // Assuming 'text' is the property in each question object that holds the question text
+            <li className="border border-surface-500 rounded-lg w-full md:w-auto p-2 my-4" key={index}>Question {index + 1} - {question.type} - {question.question} {}</li>
           ))}
         </ul>
       </div>
