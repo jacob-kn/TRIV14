@@ -23,27 +23,11 @@ export default function HostPage() {
   const [quizQuestion, setQuizQuestion] = useState();
   const [isStarted, setIsStarted] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-
-  const [currentQuestion, setCurrentQuestion] = useState();
-  const quizIds = [
-    "65691706b7ef6d91783b40b3",
-    "6569172db7ef6d91783b40b7",
-    "65695f051f91c7420db36625",
-    "656b7e516b12c29574edc587",
-  ];
+  const [questionIndex, setQuestionIndex] = useState(1);
 
   // use quiz id after joining a room to query and get
   const { data: quiz1, isLoading } = useGetQuizQuery(currentQuizId);
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery();
-
-  // initial: false, changes to true when start quiz event is fired
-
-  // either given by host or incremented by some event (next question event)
-  let questionIndex = 1;
-
-  // updated when the host tries to go to the next question after the last
-
-  // details for the winner
 
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
@@ -54,26 +38,27 @@ export default function HostPage() {
     socket.on("newQuestion", (questionObject) => {
       setQuizQuestion(questionObject);
       setStartCountdown(true);
+      setQuestionIndex(questionIndex + 1);
       setIsStarted(true);
     });
 
     socket.on("correctAnswer", (correctOption) => {
       setStartCountdown(false);
       console.log(
-        "Question time is up!\n" + "Correction option: " + correctOption
+        "Question time is up!\n" + "Correct option: " + correctOption
       );
     });
 
-    socket.on('updateScore', (scores) => {
+    socket.on("updateScore", (scores) => {
       console.log("Updating Scores");
       console.log(scores);
-    })
+    });
 
-    socket.on('quizEnded', (scores) => {
+    socket.on("quizEnded", (scores) => {
       console.log("Quiz ended. Logging scores");
       console.log(scores);
       setIsComplete(true);
-    })
+    });
 
     return () => {
       socket.off("someEvent", () => {});
@@ -118,11 +103,9 @@ export default function HostPage() {
     <div className="min-h-fit pb-16 mb-8">
       <BgFlourish flourish="3" />
       <div className="flex flex-col gap-4 items-center justify-center">
-        <div className="flex flex-row items-center ">
+        <div className="mx-4 flex flex-row items-center ">
           <div className="md:hidden flex flex-col items-center justify-center bg-surface w-fit rounded-lg">
-            <h2 className="text-white p-2 font-bold md:text-xl">
-              Participants
-            </h2>
+            <h2 className="text-white p-2 font-bold md:text-xl">Players</h2>
             <p className="text-white p-2 md:text-xl text-center">
               {players.length}
             </p>
@@ -146,7 +129,7 @@ export default function HostPage() {
           <div className="flex flex-col items-center w-1/4">
             <div className="hidden md:block flex flex-col items-center justify-center bg-surface w-3/4 rounded-lg py-2">
               <h2 className="text-white p-2 font-bold md:text-xl text-center">
-                Participants
+                Players
               </h2>
               <p className="text-white p-2 md:text-xl text-center">
                 {players.length}
@@ -180,16 +163,6 @@ export default function HostPage() {
                       className="mx-1 text-black rounded placeholder:ml-2 focus:border-sky-500 placeholder:text-gray-500 pl-[8px] placeholder:italic"
                       placeholder="Answer"
                     ></input>
-                    {/* {quizQuestion.map((option, index) => {
-                      return (
-                        
-                        <FillInTheBlank
-                          key={index}
-                          paragraphText={option.text}
-                          onTextChange={() => {}}
-                        />
-                      );
-                    })} */}
                   </p>
                 )}
               </>
@@ -198,13 +171,13 @@ export default function HostPage() {
             )}
           </div>
           <div className="flex flex-col items-center m-w-fit md:w-1/4">
-            <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
+            <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 md:my-0 py-2">
               <h2 className="text-white p-2 font-bold md:text-xl text-center">
                 {questionIndex} of {quiz1.questions.length}
               </h2>
               <div className="flex flex-row md:flex-col gap-4 my-4 items-center justify-center">
                 <button
-                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold whitespace-nowrap hover:scale-[1.03] bg-white text-bunker-100"
+                  className="flex items-center justify-center gap-2 mx-4 md:mx-0 px-5 py-3 rounded-lg font-semibold whitespace-nowrap hover:scale-[1.03] bg-white text-bunker-100"
                   style={{
                     opacity: startCountdown ? "0.5" : "1",
                     // border: selected ? "5px solid lightgreen" : "none",

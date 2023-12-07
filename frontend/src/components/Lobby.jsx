@@ -14,7 +14,7 @@ export default function Lobby({ players }) {
             Waiting for host to start the game...
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center w-1/3">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start w-1/3">
           {players ? (
             players.map((player, index) => (
               <div key={index} className="w-1/3 text-white text-center py-1">

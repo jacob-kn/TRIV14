@@ -18,12 +18,18 @@ function Main() {
         // You can set up socket event listeners here
         socket.on('validRoom', (roomCode) => {
           console.log("Room " + roomCode + " exists.");
-          // if (logged in) {
+          if (userInfo) { 
+            console.log(userInfo);
+            socket.emit('joinRoom', roomCode, userInfo.username);
+            navigate("/play/" + roomCode);
+          } else {
+            navigate("/entername/" + roomCode);
+          }
           //   navigate("/play/" + roomCode);
           // } else {}
           // socket.emit('joinRoom', roomCode, "Alice");
           // else go to the page 
-          navigate("/entername/" + roomCode);
+          
         })
 
         return () => {

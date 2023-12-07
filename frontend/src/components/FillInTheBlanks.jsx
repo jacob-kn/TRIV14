@@ -15,9 +15,9 @@ export default function FillInTheBlanks({ options, score, userInput }) {
           <p className="text-white p-2 md:text-xl text-center">{score}</p>
         </div>
       </div>
-      <div className="flex flex-col flex-wrap md:w-1/2 gap-4 items-start">
+      <div className="flex flex-col flex-wrap md:w-1/2 gap-4 items-center">
         {/* <FillInTheBlank paragraphText={customParagraph} /> */}
-        {options.map((option, index) => {
+        {/* {options.map((option, index) => {
           // console.log("options index: " + index + ", text: " + option.text);
           return (
             <FillInTheBlank
@@ -26,7 +26,12 @@ export default function FillInTheBlanks({ options, score, userInput }) {
               onTextChange={handleTextInput}
             />
           );
-        })}
+        })} */}
+        <input
+          onChange={(e) => {handleTextInput(e.target.value)}}
+          className="mx-1 text-black rounded placeholder:ml-2 focus:border-sky-500 placeholder:text-gray-500 pl-[8px] placeholder:italic"
+          placeholder="Answer"
+        ></input>
       </div>
       <div className="flex flex-col items-center m-w-fit md:w-1/4">
         <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
