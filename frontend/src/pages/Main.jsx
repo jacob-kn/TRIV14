@@ -1,18 +1,48 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'wouter';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import BgFlourish from '../components/BgFlourish';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "wouter";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import BgFlourish from "../components/BgFlourish";
+import { socket } from '../socket';
+import { navigate } from 'wouter/use-location';
 
 function Main() {
-  const [code, setCode] = useState('');
-
+  const [code, setCode] = useState("");
   const { userInfo } = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    if (socket) {
+        // You can set up socket event listeners here
+        socket.on('validRoom', (roomCode) => {
+          console.log("Room " + roomCode + " exists.");
+          if (userInfo) { 
+            console.log(userInfo);
+            socket.emit('joinRoom', roomCode, userInfo.username);
+            navigate("/play/" + roomCode);
+          } else {
+            navigate("/entername/" + roomCode);
+          }          
+        })
+
+        return () => {
+          socket.off("someEvent", () => {});
+        };
+    }else {console.log('unavailable');}
+  }, [socket]);
+
+  const enterRoom = () => {
+    console.log("Checking if room exists.");
+    if(socket){
+      socket.emit('checkRoom', code);
+    }else {
+      console.log(socket);
+    }
+  }
+
   const onChange = (e) => {
-    setCode(e.target.value);
+    setCode((e.target.value).toString());
   };
 
   return (
@@ -21,7 +51,7 @@ function Main() {
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-16 items-center justify-center px-12 pb-24">
         <div className="relative min-w-[500px] lg:w-2/3 max-w-3xl">
           <img
-            src={process.env.PUBLIC_URL + '/flourishes/join-polygons.svg'}
+            src={process.env.PUBLIC_URL + "/flourishes/join-polygons.svg"}
             className="w-full -z-10"
           />
           <div className="w-screen px-4 max-w-[282px] md:max-w-none md:w-1/2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:-translate-y-2/3">
@@ -37,7 +67,9 @@ function Main() {
                 placeholder="Room code"
                 onChange={onChange}
               />
-              <Button type="primary" className="shadow-lg">
+              <Button type="primary" className="shadow-lg" onClick={() => {
+                console.log("Button clicked");
+                enterRoom()}}>
                 Enter
               </Button>
             </div>
@@ -55,7 +87,11 @@ function Main() {
             </Button>
           </Link>
           <Link to="/quizzes">
-            <Button type="secondary" className="w-full whitespace-normal">
+            <Button
+              type="secondary"
+              className="w-full whitespace-normal"
+              onClick={() => {}}
+            >
               Explore quizzes
               <ArrowRightIcon className="w-6 h-6" />
             </Button>

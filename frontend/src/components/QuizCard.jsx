@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux'
+import { navigate } from 'wouter/use-location';
+import { socket } from '../socket';
 import { Link, useLocation } from 'wouter';
 
 import {
@@ -16,8 +19,13 @@ import {
 import Button from './Button';
 import IconButton from './IconButton';
 import DeleteButton from './DeleteButton';
+import { setQuizId, setQuizRoomCode, selectQuizRoomCode } from '../slices/quizSlice';
+
 
 const QuizCard = ({ quizId, isOwned }) => {
+  const dispatch = useDispatch();
+  const roomCode = useSelector(selectQuizRoomCode);
+
   const {
     data: quiz,
     isLoading,
@@ -29,6 +37,16 @@ const QuizCard = ({ quizId, isOwned }) => {
   const [updateQuiz] = useUpdateQuizMutation();
   const [, navigate] = useLocation();
 
+
+  useEffect(() => {
+    socket.on('roomCreated', (createdRoomCode) => {
+      navigate("/host/" + createdRoomCode);
+    });
+
+    return () => {
+        socket.off('someEvent', () => {});
+    }; 
+  }, [socket])
 
   const handleDelete = async () => {
     try {
@@ -119,6 +137,14 @@ const QuizCard = ({ quizId, isOwned }) => {
           </span>
         </div>
       </div>
+
+      <Button onClick={() => {
+        console.log(quizId);
+        dispatch(setQuizId(quizId));
+        socket.emit('createQuiz', (Math.floor(Math.random() * (10000 - 1 + 1)) + 1).toString()); // ToDo - not handling roomAlreadyExists
+      }}>
+        Host
+      </Button>
 
       {isOwned && (
         <>
