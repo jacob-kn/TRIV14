@@ -275,7 +275,7 @@ function Edit() {
         <div className='w-11/12 lg:w-1/6'>
           <ul className="rounded-md">
             {currentQuestions.map((question, index) => (
-              <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full p-2 my-4 cursor-pointer text-lg" key={index}>
+              <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full p-2 my-4 text-lg" key={index}>
                 Question {index + 1}
                 <div className="flex flex-row justify-between">
                   <IconButton className="inline" type="secondary" onClick={() => changeQuestion(index)}>

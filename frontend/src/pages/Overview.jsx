@@ -26,7 +26,7 @@ function Overview() {
       <BgFlourish flourish="3" />
       
       <div>
-        <QuizCard quizId={quizId} isOwned />
+        <QuizCard quizId={quizId} />
         <Link to="/">
           <Button className="w-96 my-4 ">Host this quiz!</Button>
         </Link>
