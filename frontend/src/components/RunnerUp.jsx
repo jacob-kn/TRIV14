@@ -16,8 +16,8 @@ export default function RunnerUp(props) {
           <p className="">{props.score}</p>
         </div>
         <div className="flex flex-col md:justify-between gap-1">
-          <p className="font-bold">Correct Answers</p>
-          <p className="">{props.correctAnswers}</p>
+          <p className="font-bold"></p>
+          <p className=""></p>
         </div>
       </div>
     </div>
