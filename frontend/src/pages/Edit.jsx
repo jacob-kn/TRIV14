@@ -227,7 +227,7 @@ function Edit() {
           name={`title`}
           value={title}
           placeholder="Title"
-          className='text-black rounded-md p-1 mr-auto w-full'
+          className='text-black rounded-md p-1 mr-auto w-full text-lg'
           onChange={(e) => handleTitleTextChange(e)}
         />
         <textarea 
@@ -236,10 +236,10 @@ function Edit() {
           id="desc" 
           name="desc" 
           placeholder={`Description`} 
-          className="text-black w-full resize-none rounded-md">
+          className="text-black w-full resize-none rounded-md text-lg">
         </textarea>
 
-        <div id="tagboxes" className='flex flex-col md:flex-row gap-3 md:gap-10 mr-auto'>
+        <div id="tagboxes" className='flex flex-col md:flex-row gap-3 md:gap-10 mr-auto text-lg'>
           <label>
             <input type="checkbox" name="Math" value=" Math" />
             Math
@@ -275,7 +275,7 @@ function Edit() {
         <div className='w-11/12 lg:w-1/6'>
           <ul className="rounded-md">
             {currentQuestions.map((question, index) => (
-              <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full p-2 my-4 cursor-pointer" key={index}>
+              <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full p-2 my-4 cursor-pointer text-lg" key={index}>
                 Question {index + 1}
                 <div className="flex flex-row justify-between">
                   <IconButton className="inline" type="secondary" onClick={() => changeQuestion(index)}>
@@ -294,15 +294,15 @@ function Edit() {
         </div>
         <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-11/12 lg:w-3/4 mr-10 mb-5">
 
-          <h2 className="mr-auto">Question {currentQuestionIndex + 1}</h2>
+          <h2 className="mr-auto text-2xl font-bold">Question {currentQuestionIndex + 1}</h2>
         
           {/* Dropdown for Question type */}
           <div className="flex flex-col gap-2 mr-auto w-1/3 rounded-md">
-              <label htmlFor="questionType">Question type</label>
+              <label htmlFor="questionType" className='text-lg'>Question type</label>
               <select
                   id="questionType"
                   name="questionType"
-                  className="text-black h-8 rounded-md w-full pr-48"
+                  className="text-black h-8 rounded-md w-full pr-48 text-lg"
                   value={questionType}
                   onChange={handleQuestionTypeChange}
               >
@@ -313,16 +313,18 @@ function Edit() {
 
           {/* Text field for Question */}
           <div className="flex flex-col gap-2 mr-auto w-full">
-              <label htmlFor="questionInput">Question</label>
-              <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" placeholder={`Enter question`} className="text-black h-20 resize-none rounded-md"></textarea>
+              <label htmlFor="questionInput" className='text-lg'>Question</label>
+              <textarea value={questionContent} onChange={(e) => setQuestionContent(e.target.value)} id="questionInput" name="questionInput" placeholder={`Enter question`} className="text-black h-20 resize-none rounded-md text-lg"></textarea>
           </div>
 
+          <label htmlFor='Answer options' className='text-lg mr-auto mt-5'>Answer options</label>
           {/*Render Multiple Choice */}
+
           {questionType === 'Multiple Choice' && (
-          <div className='flex flex-col md:flex-row gap-4 w-full justify-between'>
+          <div name="Answer options" className='flex flex-col md:flex-row gap-4 w-full justify-between'>
               {Array.from({ length: answerCount }).map((_, index) => (
               
-              <div name="mcQs" key={index} className={`bg-${['blue-violet', 'blue-violet', 'blue-violet', 'blue-violet'][index]} flex-grow rounded-md`}>
+              <div name="mcQs" key={index} className={`${['bg-blue-600', 'bg-red-600', 'bg-green-600', 'bg-purple-600'][index]} flex-grow rounded-md text-lg`}>
                 <div className='flex justify-between'>
                   <IconButton className="inline m-1" type="secondary" onClick={() => removeAnswer(index)}>
                       <TrashIcon className="w-6 h-6" />
@@ -354,10 +356,10 @@ function Edit() {
 
           {/* Render text fields for Fill in the Blanks */}
           {questionType === 'Fill in the Blank' && (
-          <div className="flex flex-col gap-4 w-full justify-between">
+          <div className="flex flex-col gap-4 w-full justify-between ">
             {/* Render text fields for Fill in the Blanks */}
             {Array.from({ length: answerCount }).map((_, index) => (
-            <div key={index} className="bg-haiti rounded-md px-2 py-4 flex flex-row ">
+            <div name="Answer options" key={index} className="bg-haiti rounded-md px-2 py-4 flex flex-row ">
                 <input
                 type="text"
                 id={`input${index + 1}`}
@@ -380,11 +382,11 @@ function Edit() {
           {/* Cancel & Delete Buttons */}
           <div className="grid grid-cols-4 gap-4 w-full">
             <Link to="/my-account">
-              <Button isSubmit type="tertiary" className="w-full">
+              <Button isSubmit type="tertiary" className="w-full text-xl">
                 Exit
               </Button>
             </Link>
-            <Button isSubmit type="secondary" className="w-full" onClick={handleSaveQuiz}>
+            <Button isSubmit type="secondary" className="w-full text-xl font-bold" onClick={handleSaveQuiz}>
             Save Quiz
             </Button>
           </div>
