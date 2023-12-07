@@ -35,7 +35,6 @@ const setupWebSocket = (io) => {
                 socket.join(roomCode); // Having the host join the room, ends up creating the room
                 roomData.set(roomCode, new Map());
                 socket.emit("roomCreated", roomCode);
-                console.log("Room Created with code (backend): " + roomCode);
             } else {
                 socket.emit('roomAlreadyExists', roomCode);
             }
@@ -52,10 +51,7 @@ const setupWebSocket = (io) => {
         })
 
         socket.on('submitAnswer', (selectedAnswer, roomCode) => {
-            console.log("Handling answer");
-            console.log("room code: " + roomCode);
-            console.log("answer: " + selectedAnswer);
-            handleAnswer(io, socket.id, selectedAnswer, roomCode);
+            handleAnswer(socket.id, selectedAnswer, roomCode);
         })
 
         socket.on('nextQuestion', (roomCode) => {

@@ -6,34 +6,37 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
     let scores = {};
 
     function nextQuestion() {
-        io.to(roomCode).sockets.forEach((socket) => {
-            if(!scores[socket.id]){
-                scores[socket.id] = 0 // Setting initial scores to 0
+        io.to(roomCode).fetchSockets().then(sockets => {
+            sockets.forEach((socket) => {
+                if (!scores[socket.id] && socket.id != hostId) {
+                    scores[socket.id] = 0; // Setting initial scores to 0
+                }
+            });
+            currentQuestion++;
+            if (currentQuestion < quiz.questions.length) {
+                const fullQuestion = quiz.questions[currentQuestion];
+                const questionToSend = {
+                    title: quiz.title,
+                    type: fullQuestion.type,
+                    question: fullQuestion.question,
+                    options: fullQuestion.options.map(option => ({ text: option.text }))
+                };
+
+                io.to(roomCode).emit('newQuestion', questionToSend);
+
+                // Set a timeout to emit the correct answer after the question duration
+                setTimeout(() => {
+                    const correctOptions = fullQuestion.options.filter(option => option.isCorrect);
+                    io.to(roomCode).emit('correctAnswer', correctOptions.map(option => option.text));
+                }, duration * 1000 + 1000);
+
+            } else {
+                // End of the quiz
+                io.to(roomCode).emit('quizEnded', scores);
             }
+        }).catch(err => {
+            console.error("Error fetching sockets in room:", err); //TODO: Close room
         });
-        currentQuestion++;
-
-        if (currentQuestion < quiz.questions.length) {
-            const fullQuestion = quiz.questions[currentQuestion];
-            const questionToSend = {
-                title: quiz.title,
-                type: fullQuestion.type,
-                question: fullQuestion.question,
-                options: fullQuestion.options.map(option => ({ text: option.text }))
-            };
-
-            io.to(roomCode).emit('newQuestion', questionToSend);
-
-            // Set a timeout to emit the correct answer after the question duration
-            setTimeout(() => {
-                const correctOption = fullQuestion.options.find(option => option.isCorrect);
-                io.to(roomCode).emit('correctAnswer', correctOption.text); // Emit only the text of the correct option
-            }, duration * 1000 + 1000);
-
-        } else {
-            // End of the quiz
-            io.to(roomCode).emit('quizEnded', scores);
-        }
     }
 
     nextQuestion() // starting the quiz off
@@ -42,15 +45,16 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
     quizSessions.set(roomCode, { quiz, currentQuestion, scores, nextQuestion, hostId });
 }
 
-function handleAnswer(io, socketId, submittedAnswer, roomCode) {
-    console.log("handling answers for roomcode: " + roomCode);
+function handleAnswer(socketId, submittedAnswer, roomCode) {
     const session = quizSessions.get(roomCode);
     const currentQuestion = session.quiz.questions[session.currentQuestion];
 
     if (currentQuestion) {
-        const correctOption = currentQuestion.options.find(option => option.isCorrect);
-        if (correctOption && correctOption.text === submittedAnswer) {
-            session.scores[socketId] = (session.scores[socketId] || 0) + POINTS_PER_CORRECT_ANSWER;
+        const isCorrect = currentQuestion.options.some(
+                option => option.isCorrect && option.text == submittedAnswer // Arrow function (structure is kind of like Haskell)
+            );
+        if (isCorrect) {
+            session.scores[socketId] = (session.scores[socketId] || 0) + POINTS_PER_CORRECT_ANSWER; // updating score
         }
     }
 }
