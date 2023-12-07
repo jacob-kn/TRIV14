@@ -21,12 +21,10 @@ export default function QuizPage() {
   const [answer, setAnswer] = useState("no answer");
   const duration = 15;
   const [startCountdown, setStartCountdown] = useState(false);
+  const [score, setScore] = ("0");
 
   // use quiz id after joining a room to query and get
   const { data: user, isLoading } = useGetUserQuery();
-
-  // score
-  let score = 0;
 
   // details for the winner
 
@@ -51,7 +49,13 @@ export default function QuizPage() {
       console.log("Question time is up!\n" + "Correct answer: " + correctOption);
     })
 
+    socket.on('updateScore', (scores) => {
+      console.log("Updating Scores");
+      console.log(scores);
+    })
+
     socket.on('quizEnded', (scores) => {
+      console.log("Quiz ended. Logging scores");
       console.log(scores);
       setIsComplete(true);
     })

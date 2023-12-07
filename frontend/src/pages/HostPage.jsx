@@ -57,12 +57,20 @@ export default function HostPage() {
       setIsStarted(true);
     });
 
-    socket.on('correctAnswer', (correctOption) => {
+    socket.on("correctAnswer", (correctOption) => {
       setStartCountdown(false);
-      console.log("Question time is up!\n" + "Correction option: " + correctOption);
+      console.log(
+        "Question time is up!\n" + "Correction option: " + correctOption
+      );
+    });
+
+    socket.on('updateScore', (scores) => {
+      console.log("Updating Scores");
+      console.log(scores);
     })
 
     socket.on('quizEnded', (scores) => {
+      console.log("Quiz ended. Logging scores");
       console.log(scores);
       setIsComplete(true);
     })
@@ -115,7 +123,9 @@ export default function HostPage() {
             <h2 className="text-white p-2 font-bold md:text-xl">
               Participants
             </h2>
-            <p className="text-white p-2 md:text-xl text-center">{players.length}</p>
+            <p className="text-white p-2 md:text-xl text-center">
+              {players.length}
+            </p>
           </div>
           <h1 className="text-white text-2xl font-bold px-4">
             {quizQuestion.title}
@@ -164,17 +174,23 @@ export default function HostPage() {
                     })}
                   </>
                 ) : (
-                  <>
-                    {quizQuestion.map((option, index) => {
+                  <p>
+                    <input
+                      onChange={() => {}}
+                      className="mx-1 text-black rounded placeholder:ml-2 focus:border-sky-500 placeholder:text-gray-500 pl-[8px] placeholder:italic"
+                      placeholder="Answer"
+                    ></input>
+                    {/* {quizQuestion.map((option, index) => {
                       return (
+                        
                         <FillInTheBlank
                           key={index}
                           paragraphText={option.text}
                           onTextChange={() => {}}
                         />
                       );
-                    })}
-                  </>
+                    })} */}
+                  </p>
                 )}
               </>
             ) : (
@@ -187,10 +203,22 @@ export default function HostPage() {
                 {questionIndex} of {quiz1.questions.length}
               </h2>
               <div className="flex flex-row md:flex-col gap-4 my-4 items-center justify-center">
-                <Button onClick={() => {
-                  console.log("Next button clicked - going to the next question.");
-                  socket.emit('nextQuestion', roomCode);
-                }}>Next</Button>
+                <button
+                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold whitespace-nowrap hover:scale-[1.03] bg-white text-bunker-100"
+                  style={{
+                    opacity: startCountdown ? "0.5" : "1",
+                    // border: selected ? "5px solid lightgreen" : "none",
+                  }}
+                  onClick={() => {
+                    console.log(
+                      "Next button clicked - going to the next question."
+                    );
+                    socket.emit("nextQuestion", roomCode);
+                  }}
+                  disabled={startCountdown}
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>

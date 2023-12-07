@@ -64,9 +64,11 @@ function handleNextQuestion(io, socketId, roomCode) {
     if (session && session.hostId === socketId) { // verfying its the host doing this event
 
         const participantScores = session.scores;
+        console.log(participantScores);
 
         // Send each participant their current score
         for (let id in participantScores) {
+            console.log("emiting update score (backend");
             const score = participantScores[id];
             io.to(id).emit('updateScore', score);
         }

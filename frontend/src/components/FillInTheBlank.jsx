@@ -7,7 +7,7 @@ export default function FillInTheBlank({ paragraphText, onTextChange }) {
     setTextInput(e.target.value);
     onTextChange(e.target.value);
   };
-
+  
   return (
     <div>
       <p className="text-white">
