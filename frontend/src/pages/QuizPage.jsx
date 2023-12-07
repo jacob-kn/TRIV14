@@ -18,10 +18,10 @@ export default function QuizPage() {
   const [quizQuestion, setQuizQuestion] = useState();
   const [isClickable, setIsClickable] = useState(true);
   const [players, setPlayers] = useState([]);
-  const [answer, setAnswer] = useState("no answer");
   const duration = 15;
   const [startCountdown, setStartCountdown] = useState(false);
-  const [score, setScore] = ("0");
+  const [score, setScore] = useState(0);
+
 
   // use quiz id after joining a room to query and get
   const { data: user, isLoading } = useGetUserQuery();
@@ -30,34 +30,38 @@ export default function QuizPage() {
 
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
-      console.log(playerArray);
       setPlayers(playerArray);
     });
 
     socket.on('newQuestion', (questionObject) => {
       setQuizQuestion(questionObject);
       setStartCountdown(true);
+      setIsClickable(true);
       setIsStarted(true);
     });
 
     socket.on('correctAnswer', (correctOption) => {
-      // players submit when the correctAnswer is emitted which means time is up
       setStartCountdown(false);
-      console.log("Submitting: " + answer);
-      console.log("For roomcode: " + roomCode);
-      socket.emit('submitAnswer', answer, roomCode); //Todo - error
-      console.log("Question time is up!\n" + "Correct answer: " + correctOption);
     })
 
-    socket.on('updateScore', (scores) => {
+    socket.on('updateScore', (questionScore) => {
       console.log("Updating Scores");
-      console.log(scores);
+      console.log(questionScore);
+      setScore(score + questionScore);
     })
 
     socket.on('quizEnded', (scores) => {
+      setScore(scores);
       console.log("Quiz ended. Logging scores");
-      console.log(scores);
+      console.log(score);
+      
+      // socket.emit('socketToUser', scores, roomCode);
       setIsComplete(true);
+    })
+
+    socket.on('finalScores', (userScores) => {
+      setScore(userScores);
+      console.log(score);
     })
 
     return () => {
@@ -67,9 +71,8 @@ export default function QuizPage() {
   }, [socket]);
 
   const handleUserInput = (ans) => {
-    setAnswer(ans);
-    
-    console.log("User's Input: " + answer);
+    socket.emit('submitAnswer', ans, roomCode); //Todo - error
+    setIsClickable(false);
   }  
 
   if (isLoading) {
@@ -84,10 +87,11 @@ export default function QuizPage() {
     );
   }
 
+
   if (isComplete) {
     return (
       <>
-        <WinnerPage />
+        <WinnerPage scores={score}/>
       </>
     );
   }
@@ -129,6 +133,7 @@ export default function QuizPage() {
                   options={quizQuestion.options}
                   score={score}
                   userInput={handleUserInput}
+                  isClickable={isClickable}
                 />
               )}
             </>

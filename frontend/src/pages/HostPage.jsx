@@ -24,6 +24,7 @@ export default function HostPage() {
   const [isStarted, setIsStarted] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(1);
+  const [score, setScore] = useState();
 
   // use quiz id after joining a room to query and get
   const { data: quiz1, isLoading } = useGetQuizQuery(currentQuizId);
@@ -31,14 +32,13 @@ export default function HostPage() {
 
   useEffect(() => {
     socket.on("updatedUserList", (playerArray) => {
-      console.log(playerArray);
       setPlayers(playerArray);
     });
 
     socket.on("newQuestion", (questionObject) => {
       setQuizQuestion(questionObject);
       setStartCountdown(true);
-      setQuestionIndex(questionIndex + 1);
+      
       setIsStarted(true);
     });
 
@@ -55,6 +55,7 @@ export default function HostPage() {
     });
 
     socket.on("quizEnded", (scores) => {
+      setScore(scores);
       console.log("Quiz ended. Logging scores");
       console.log(scores);
       setIsComplete(true);
@@ -94,7 +95,7 @@ export default function HostPage() {
   if (isComplete) {
     return (
       <>
-        <WinnerPage />
+        <WinnerPage scores={score}/>
       </>
     );
   }
@@ -187,6 +188,9 @@ export default function HostPage() {
                       "Next button clicked - going to the next question."
                     );
                     socket.emit("nextQuestion", roomCode);
+                    if (questionIndex < quiz1.questions.length) {
+                      setQuestionIndex(questionIndex + 1);
+                    }
                   }}
                   disabled={startCountdown}
                 >

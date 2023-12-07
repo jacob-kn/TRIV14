@@ -1,7 +1,16 @@
 import BgFlourish from "../components/BgFlourish";
 import RunnerUp from "../components/RunnerUp";
 
-export default function WinnerPage({ details }) {
+export default function WinnerPage({ scores }) {
+  const mapArray = Array.from(scores.entries());
+  mapArray.sort((a, b) => b[1] - a[1]);
+  const sortedMap = new Map(mapArray);
+
+  const valuesIterator = sortedMap.values();
+  const first = valuesIterator.next().value;
+  const second = valuesIterator.next().value;
+  const third = valuesIterator.next().value;
+
   return (
     <div className="min-h-fit pb-20 flex justify-center text-white">
       <BgFlourish flourish="3" />
@@ -14,38 +23,38 @@ export default function WinnerPage({ details }) {
               alt="Avatar"
               className="h-24 w-24 self-center"
             />
-            <p className="">Display Name</p>
+            <p className="">Alice</p>
             <div className="flex flex-row justify-between text-left gap-2">
               <p className="pl-8 w-2/3">Score</p>
-              <p className="w-1/3">10000</p>
+              <p className="w-1/3">3</p>
             </div>
             <div className="flex flex-row justify-between text-left gap-2">
-              <p className="pl-8 w-2/3">Correct Answers</p>
-              <p className="w-1/3">20</p>
+              <p className="pl-8 w-2/3"></p>
+              <p className="w-1/3"></p>
             </div>
             <div className="flex flex-row justify-between text-left gap-2">
-              <p className="pl-8 w-2/3">Highest Streak</p>
-              <p className="w-1/3">20</p>
+              <p className="pl-8 w-2/3"></p>
+              <p className="w-1/3"></p>
             </div>
             <div className="flex flex-row justify-between text-left gap-2">
-              <p className="pl-8 w-2/3">Time Taken</p>
-              <p className="w-1/3">5m32s</p>
+              <p className="pl-8 w-2/3"></p>
+              <p className="w-1/3"></p>
             </div>
           </div>
         </div>
         <div className="md:w-1/2 flex flex-col h-full p-8 gap-8">
           <RunnerUp
             rank="2nd"
-            name="DisplayNameDisplayName"
+            name="Bob"
             avatar={process.env.PUBLIC_URL + `/avatars/avatar-2.svg`}
-            score="9000"
+            score="0"
             correctAnswers="18"
           />
           <RunnerUp
             rank="3rd"
-            name="Alice"
+            name="Charlie"
             avatar={process.env.PUBLIC_URL + `/avatars/avatar-3.svg`}
-            score="9000"
+            score="0"
             correctAnswers="18"
           />
         </div>

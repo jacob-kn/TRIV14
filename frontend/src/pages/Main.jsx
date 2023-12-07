@@ -13,7 +13,6 @@ function Main() {
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log("Main");
     if (socket) {
         // You can set up socket event listeners here
         socket.on('validRoom', (roomCode) => {
@@ -24,12 +23,7 @@ function Main() {
             navigate("/play/" + roomCode);
           } else {
             navigate("/entername/" + roomCode);
-          }
-          //   navigate("/play/" + roomCode);
-          // } else {}
-          // socket.emit('joinRoom', roomCode, "Alice");
-          // else go to the page 
-          
+          }          
         })
 
         return () => {

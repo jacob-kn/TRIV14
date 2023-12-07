@@ -1,8 +1,21 @@
+import { useState } from "react";
 import FillInTheBlank from "./FillInTheBlank";
 
-export default function FillInTheBlanks({ options, score, userInput }) {
-  const handleTextInput = (textInput) => {
+export default function FillInTheBlanks({
+  options,
+  score,
+  userInput,
+  isClickable,
+}) {
+  const [textInput, setTextInput] = useState("");
+
+  const handleClick = () => {
     userInput(textInput);
+  };
+
+  const handleTextInput = (e) => {
+    console.log(e);
+    setTextInput(e);
   };
 
   return (
@@ -28,10 +41,20 @@ export default function FillInTheBlanks({ options, score, userInput }) {
           );
         })} */}
         <input
-          onChange={(e) => {handleTextInput(e.target.value)}}
+          onChange={(e) => {
+            handleTextInput(e.target.value);
+          }}
           className="mx-1 text-black rounded placeholder:ml-2 focus:border-sky-500 placeholder:text-gray-500 pl-[8px] placeholder:italic"
           placeholder="Answer"
         ></input>
+
+        <button
+          disabled={!isClickable}
+          onClick={handleClick}
+          className="flex items-center justify-center gap-2 mx-4 md:mx-0 px-5 py-3 rounded-lg font-semibold whitespace-nowrap hover:scale-[1.03] bg-white text-bunker-100"
+        >
+          Submit
+        </button>
       </div>
       <div className="flex flex-col items-center m-w-fit md:w-1/4">
         <div className="flex flex-col justify-center bg-surface min-w-fit md:w-3/4 rounded-lg my-4 py-2">
