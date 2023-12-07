@@ -1,6 +1,6 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 
 import {
   useGetQuizQuery,
@@ -27,6 +27,8 @@ const QuizCard = ({ quizId, isOwned }) => {
   } = useGetQuizQuery(quizId);
   const [removeQuiz] = useRemoveQuizMutation();
   const [updateQuiz] = useUpdateQuizMutation();
+  const [, navigate] = useLocation();
+
 
   const handleDelete = async () => {
     try {
@@ -54,6 +56,7 @@ const QuizCard = ({ quizId, isOwned }) => {
       toast.error(err?.data?.message || err.error);
     }
   };
+  
 
   if (isError) {
     return (
@@ -86,31 +89,37 @@ const QuizCard = ({ quizId, isOwned }) => {
   }
 
   return (
-    <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white max-w-[24rem] w-[90vw]">
-      <h3 className="text-xl sm:text-2xl font-bold text-center w-full px-10 line-clamp-2">
-        {quiz.title}
-      </h3>
-      <h3 className="text-md text-center line-clamp-3">
-        <span>{quiz.description}</span>
-      </h3>
-      <div className="flex-grow flex justify-around items-end gap-6">
-        {quiz.tags && (
-          <div className="flex flex-wrap justify-center gap-2">
-            {quiz.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="px-4 py-1 rounded-full bg-blue-violet"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        <span className="flex gap-1 py-1 whitespace-nowrap">
-          <UserIcon className="w-6 h-6" />
-          Plays: {quiz.plays}
-        </span>
+    <div className="relative flex flex-col gap-4 p-6 rounded-xl bg-surface text-white max-w-[24rem] w-[90vw]">
+      <div
+        className="flex flex-col grow gap-4 items-center hover:opacity-80 hover:cursor-pointer"
+        onClick={() => navigate(`/quizzes/${quizId}/overview`)}
+      >
+        <h3 className="text-xl sm:text-2xl font-bold text-center w-full px-10 line-clamp-2">
+          {quiz.title}
+        </h3>
+        <h3 className="text-md text-center line-clamp-3">
+          <span>{quiz.description}</span>
+        </h3>
+        <div className="flex-grow flex justify-around items-end gap-6">
+          {quiz.tags && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {quiz.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-4 py-1 rounded-full bg-blue-violet"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <span className="flex gap-1 py-1 whitespace-nowrap">
+            <UserIcon className="w-6 h-6" />
+            Plays: {quiz.plays}
+          </span>
+        </div>
       </div>
+
       {isOwned && (
         <>
           <DeleteButton

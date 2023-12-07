@@ -14,6 +14,9 @@ import Register from './pages/Register';
 import MyAccount from './pages/MyAccount';
 import UserSettings from './pages/UserSettings';
 import Quizzes from './pages/Quizzes';
+import Overview from './pages/Overview';
+import Edit from './pages/Edit';
+import Create from './pages/Create';
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
       <Route path="/my-account" component={MyAccount} />
       <Route path="/my-account/settings" component={UserSettings} />
       <Route path="/quizzes" component={Quizzes} />
+      <Route path="/quizzes/:quizId/overview" component={Overview} />
+      <Route path="/quizzes/:quizId/edit" component={Edit} />
+      <Route path="/quizzes/create" component={Create} />
       <ToastContainer theme="dark" />
     </div>
   );
