@@ -15,12 +15,16 @@ function Edit() {
   const [updateQuiz, { isLoading: isUpdating }] = useUpdateQuizMutation();
   const [, navigate] = useLocation();
   
+  const defaultTF = [
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: false },
+  ]
 
   const defaultOptions = [
-    { text: 'a', isCorrect: true },
-    { text: 'b', isCorrect: true },
-    { text: 'c', isCorrect: true },
-    { text: 'd', isCorrect: true },
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
+    { text: '', isCorrect: true },
   ];
   const defaultQuestion = {
     question: '',
@@ -113,9 +117,11 @@ function Edit() {
     // Adjust answers if switching from Fill in the Blank to multiple choice
     if (event.target.value === 'Multiple Choice' && answerCount > 4) {
       setAnswerCount(4);
+      setCurrentAnswers(defaultOptions);
     }
     if (event.target.value === 'Multiple Choice' && answerCount < 2) {
       setAnswerCount(2);
+      setCurrentAnswers(defaultTF);
     }
   };
 
@@ -211,39 +217,17 @@ function Edit() {
   
 
   return (
-    <div className="flex flex-row gap-9 ml-10">
-        <BgFlourish flourish="3" />
-        
-        {/* List of Questions */}
-        <div className='w-1/12'>
-        <ul className=" md:max-w-7xl rounded-md">
-          {currentQuestions.map((question, index) => (
-            <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full md:w-auto p-2 my-4 cursor-pointer" key={index}>
-              Question {index + 1}: {question.type}
-              <div className="flex flex-row justify-between">
-                <IconButton className="inline" type="secondary" onClick={() => changeQuestion(index)}>
-                    <PencilSquareIcon className="w-6 h-6" />
-              </IconButton>
-              <IconButton className="inline" type="secondary" onClick={() => removeQuestion(index)}>
-                    <TrashIcon className="w-6 h-6" />
-              </IconButton>
-              </div>
-              
-            </li>
-          ))}
-        </ul>
-        <Button className="w-full" onClick={addQuestion}>+</Button>
-      </div>
+    <div className="flex flex-col md:gap-9 ml-3 lg:ml-10 w-full">
+      <BgFlourish flourish="3" />
 
-
-      <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-4/5 mr-10">
+      <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-11/12 mr-10">
         <input
           type="text"
           id={`title`}
           name={`title`}
           value={title}
           placeholder="Title"
-          className='text-black rounded-md p-1 mr-auto w-5/6'
+          className='text-black rounded-md p-1 mr-auto w-full'
           onChange={(e) => handleTitleTextChange(e)}
         />
         <textarea 
@@ -255,43 +239,70 @@ function Edit() {
           className="text-black w-full resize-none rounded-md">
         </textarea>
 
-          <div id="tagboxes" className='flex flex-row gap-10 '>
-            <label>
-              <input type="checkbox" name="Math" value=" Math" />
-              Math
-            </label>
-            <label>
-              <input type="checkbox" name="Science" value=" Science" />
-              Science
-            </label>
-            <label>
-              <input type="checkbox" name="History" value=" History" />
-              History
-            </label>
-            <label>
-              <input type="checkbox" name="Literature" value=" Literature" />
-              Literature
-            </label>
-            <label>
-              <input type="checkbox" name="Geography" value=" Geography" />
-              Geography
-            </label>
-            <label>
-              <input type="checkbox" name="PopCulture" value=" Pop Culture" />
-              Pop Culture
-            </label>
-          </div>
+        <div id="tagboxes" className='flex flex-col md:flex-row gap-3 md:gap-10 mr-auto'>
+          <label>
+            <input type="checkbox" name="Math" value=" Math" />
+            Math
+          </label>
+          <label>
+            <input type="checkbox" name="Science" value=" Science" />
+            Science
+          </label>
+          <label>
+            <input type="checkbox" name="History" value=" History" />
+            History
+          </label>
+          <label>
+            <input type="checkbox" name="Literature" value=" Literature" />
+            Literature
+          </label>
+          <label>
+            <input type="checkbox" name="Geography" value=" Geography" />
+            Geography
+          </label>
+          <label>
+            <input type="checkbox" name="PopCulture" value=" Pop Culture" />
+            Pop Culture
+          </label>
+        </div>
+      </div>
+        
+      
+
+      <div className='flex flex-col lg:flex-row gap-5 w-full'>
+
+        {/* List of Questions */}
+        <div className='w-11/12 lg:w-1/6'>
+          <ul className="rounded-md">
+            {currentQuestions.map((question, index) => (
+              <li className="flex flex-col justify-between text-white bg-surface rounded-lg w-full p-2 my-4 cursor-pointer" key={index}>
+                Question {index + 1}
+                <div className="flex flex-row justify-between">
+                  <IconButton className="inline" type="secondary" onClick={() => changeQuestion(index)}>
+                      <PencilSquareIcon className="w-6 h-6" />
+                  </IconButton>
+                  <IconButton className="inline" type="secondary" onClick={() => removeQuestion(index)}>
+                        <TrashIcon className="w-6 h-6" />
+                  </IconButton>
+                </div>
+                
+              </li>
+            ))}
+          </ul>
+          <Button className="w-full" onClick={addQuestion}>+</Button>
+        
+        </div>
+        <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-11/12 lg:w-3/4 mr-10 mb-5">
 
           <h2 className="mr-auto">Question {currentQuestionIndex + 1}</h2>
-          
-  
+        
           {/* Dropdown for Question type */}
-              <div className="flex flex-col gap-2 mr-auto w-1/3 rounded-md">
+          <div className="flex flex-col gap-2 mr-auto w-1/3 rounded-md">
               <label htmlFor="questionType">Question type</label>
               <select
                   id="questionType"
                   name="questionType"
-                  className="text-black h-8 rounded-md"
+                  className="text-black h-8 rounded-md w-full pr-48"
                   value={questionType}
                   onChange={handleQuestionTypeChange}
               >
@@ -299,7 +310,7 @@ function Edit() {
                   <option value="Fill in the Blank">Fill in the Blank</option>
               </select>
           </div>
-  
+
           {/* Text field for Question */}
           <div className="flex flex-col gap-2 mr-auto w-full">
               <label htmlFor="questionInput">Question</label>
@@ -308,11 +319,11 @@ function Edit() {
 
           {/*Render Multiple Choice */}
           {questionType === 'Multiple Choice' && (
-          <div className='flex flex-row gap-4 w-full justify-between'>
+          <div className='flex flex-col md:flex-row gap-4 w-full justify-between'>
               {Array.from({ length: answerCount }).map((_, index) => (
               
               <div name="mcQs" key={index} className={`bg-${['blue-violet', 'blue-violet', 'blue-violet', 'blue-violet'][index]} flex-grow rounded-md`}>
-                  <div className='flex justify-between'>
+                <div className='flex justify-between'>
                   <IconButton className="inline m-1" type="secondary" onClick={() => removeAnswer(index)}>
                       <TrashIcon className="w-6 h-6" />
                   </IconButton>
@@ -344,53 +355,51 @@ function Edit() {
           {/* Render text fields for Fill in the Blanks */}
           {questionType === 'Fill in the Blank' && (
           <div className="flex flex-col gap-4 w-full justify-between">
-              {/* Render text fields for Fill in the Blanks */}
-              {Array.from({ length: answerCount }).map((_, index) => (
-              <div key={index} className="bg-haiti rounded-md px-2 py-4 flex flex-row ">
-                  <input
-                  type="text"
-                  id={`input${index + 1}`}
-                  name={`input${index + 1}`}
-                  placeholder={`Fill in the Blank ${index + 1}`}
-                  className="text-black  rounded-md p-1 w-full"
-                  value={currentAnswers[index].text}
-                  onChange={(e) => handleAnswerTextChange(e, index)}
-                  />
-                  <IconButton className="inline m-1" type="secondary" onClick={() => removeAnswer(index)}>
-                      <TrashIcon className="w-6 h-6" />
-                  </IconButton>
-              </div>
-              ))}
-              {answerCount < 100 && <Button onClick={addAnswer}>+</Button>}
+            {/* Render text fields for Fill in the Blanks */}
+            {Array.from({ length: answerCount }).map((_, index) => (
+            <div key={index} className="bg-haiti rounded-md px-2 py-4 flex flex-row ">
+                <input
+                type="text"
+                id={`input${index + 1}`}
+                name={`input${index + 1}`}
+                placeholder={`Fill in the Blank ${index + 1}`}
+                className="text-black  rounded-md p-1 w-full"
+                value={currentAnswers[index].text}
+                onChange={(e) => handleAnswerTextChange(e, index)}
+                />
+                <IconButton className="inline m-1" type="secondary" onClick={() => removeAnswer(index)}>
+                    <TrashIcon className="w-6 h-6" />
+                </IconButton>
+            </div>
+            ))}
+            {answerCount < 100 && <Button onClick={addAnswer}>+</Button>}
           </div>
           )}
 
       
           {/* Cancel & Delete Buttons */}
           <div className="grid grid-cols-4 gap-4 w-full">
-              <Link to="/my-account">
-                <Button isSubmit type="tertiary" className="w-full">
-                  Exit
-                </Button>
-              </Link>
-              <Button isSubmit type="secondary" className="w-full" onClick={handleSaveQuiz}>
-              Save Quiz
+            <Link to="/my-account">
+              <Button isSubmit type="tertiary" className="w-full">
+                Exit
               </Button>
+            </Link>
+            <Button isSubmit type="secondary" className="w-full" onClick={handleSaveQuiz}>
+            Save Quiz
+            </Button>
           </div>
           <style jsx>{`
-              .grid {
-              display: grid;
-              grid-template-columns: 1fr 6fr; /* Set column widths as desired */
-              gap: 1rem; /* Adjust the gap between columns */
-              }
-              .grid > * {
-              grid-column: span 1; /* Ensure each button spans only 1 column */
-              }
+            .grid {
+            display: grid;
+            grid-template-columns: 1fr 6fr; /* Set column widths as desired */
+            gap: 1rem; /* Adjust the gap between columns */
+            }
+            .grid > * {
+            grid-column: span 1; /* Ensure each button spans only 1 column */
+            }
           `}</style>
         </div>
-
-        
-
+      </div>
     </div>
   );
 }
