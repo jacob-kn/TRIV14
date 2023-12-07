@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
 import { toast } from 'react-toastify';
 import { useGetQuizzesQuery } from '../slices/quizzesApiSlice';
 
-import Loader from '../components/Loader';
 import Spinner from '../components/Spinner';
 import BgFlourish from '../components/BgFlourish';
 import QuizCard from '../components/QuizCard';
@@ -16,7 +14,7 @@ function Quizzes() {
   const [filter, setFilter] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
 
-  const { data, isLoading, isFetching, isError } = useGetQuizzesQuery({
+  const { data, isLoading, isFetching, isError, error } = useGetQuizzesQuery({
     page,
     sort,
     filter,
@@ -151,7 +149,7 @@ function Quizzes() {
             <div className="flex justify-center">
               <h3 className="text-gray-200 flex gap-2">
                 <ExclamationCircleIcon className="w-6 h-6" />
-                Could not load quizzes. Please try again later.
+                {error?.data?.message || error.error}
               </h3>
             </div>
           ) : !quizzes.length ? (

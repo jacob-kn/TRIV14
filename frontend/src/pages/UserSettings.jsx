@@ -31,7 +31,13 @@ function UserSettings() {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const { data: user, isLoading, isFetching, isError } = useGetUserQuery();
+  const {
+    data: user,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useGetUserQuery();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
@@ -112,7 +118,7 @@ function UserSettings() {
       <div className="flex justify-center mt-16">
         <h2 className="flex flex-col items-center text-gray-200 text-2xl">
           <ExclamationCircleIcon className="w-8 h-8" />
-          Could not load user
+          {error?.data?.message || error?.error}
         </h2>
       </div>
     );

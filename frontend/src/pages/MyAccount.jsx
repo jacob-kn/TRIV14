@@ -24,11 +24,12 @@ function MyAccount() {
   const { userInfo } = useSelector((state) => state.auth);
   const [page, setPage] = useState(1);
 
-  const { data: user, isLoading, isError } = useGetUserQuery();
+  const { data: user, isLoading, isError, error } = useGetUserQuery();
   const {
     data,
     isLoading: isLoadingQuizzes,
     isError: isErrorQuizzes,
+    error: errorQuizzes,
   } = useGetUserQuizzesQuery();
 
   const quizzes = data?.quizzes;
@@ -49,7 +50,7 @@ function MyAccount() {
       <div className="flex justify-center mt-16">
         <h2 className="flex flex-col items-center text-gray-200 text-2xl">
           <ExclamationCircleIcon className="w-8 h-8" />
-          Could not load user
+          {error?.data?.message || error?.error}
         </h2>
       </div>
     );
@@ -95,7 +96,10 @@ function MyAccount() {
             {isLoadingQuizzes ? (
               <Spinner />
             ) : isErrorQuizzes ? (
-              <ExclamationCircleIcon className="w-6 h-6" />
+              <h3 className="text-gray-200 flex gap-2">
+                <ExclamationCircleIcon className="w-6 h-6" />
+                {errorQuizzes?.data?.message || errorQuizzes.error}
+              </h3>
             ) : (
               <span>{quizzes.length}</span>
             )}
