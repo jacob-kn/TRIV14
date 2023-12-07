@@ -22,24 +22,32 @@ function Overview() {
   }
 
   return (
-    <div className="flex flex-row gap-9 ml-10">
+    <div className="flex flex-col md:flex-row gap-9 ml-10">
       <BgFlourish flourish="3" />
       
       <div>
         <QuizCard quizId={quizId} isOwned />
         <Link to="/">
-          <Button className="w-full my-4">Host this quiz!</Button>
+          <Button className="w-96 my-4 ">Host this quiz!</Button>
         </Link>
       </div>
 
-      <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white w-4/5 mr-10">
+      <div className="relative flex flex-col gap-4 items-center p-6 rounded-xl bg-surface text-white md:w-5/12 lg:w-7/12 xl:w-2/3 mr-10 mb-10">
         
-        <h2 className="mr-auto">Questions ({quiz.questions.length})</h2>
+        <h2 className="mr-auto font-bold text-2xl">Questions ({quiz.questions.length})</h2>
         
 
         <ul className="w-full md:max-w-7xl">
           {quiz.questions.map((question, index) => (
-            <li className="border border-surface-500 rounded-lg w-full md:w-auto p-2 my-4" key={index}>Question {index + 1} - {question.type} - {question.question} {}</li>
+            <li className="border border-surface-500 rounded-lg w-full md:w-auto p-2 my-4" key={index}>
+              <div className='text-lg'>
+                Question {index + 1} - {question.type}
+              </div>
+              
+              <div className='font-bold text-ellipsis overflow-hidden'>
+                {question.question}
+              </div>
+            </li>
           ))}
         </ul>
       </div>
