@@ -21,7 +21,7 @@ export default function HostLobby({ players, startQuiz }) {
             <Button type="primary" className="shadow-lg" onClick={() => {
               startQuiz();
             }}>
-              Enter
+              Start Quiz
             </Button>
           </div>
         </div>

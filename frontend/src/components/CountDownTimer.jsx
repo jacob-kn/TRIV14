@@ -44,7 +44,7 @@ const CountdownBar = ({ totalSeconds, onCountdownEnd, startCountdown }) => {
         <div className="flex mb-2 items-center justify-between">
           <div className="flex-1 relative">
             <div className="flex items-center justify-between bg-surface rounded-full">
-              <div className="absolute left-2 text-white flex items-center justify-center">
+              <div className="pl-2 absolute left-2 text-white flex items-center justify-center">
                 Time
               </div>
               <div className="absolute text-white flex items-center justify-center inset-0">
@@ -52,7 +52,7 @@ const CountdownBar = ({ totalSeconds, onCountdownEnd, startCountdown }) => {
               </div>
               {/* Bar Filler (change the width dynamically based on the countdown) */}
               <div
-                className="w-full bg-gradient-to-r from-[#e6b1ff] to-[#9773ff] rounded-full h-6"
+                className="w-full bg-gradient-to-r from-[#e6b1ff] to-[#9773ff] rounded-full h-8"
                 style={{ width: `${barWidth}%` }}
               ></div>
             </div>
