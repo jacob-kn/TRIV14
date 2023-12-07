@@ -13,6 +13,9 @@ import Register from "./pages/Register";
 import MyAccount from "./pages/MyAccount";
 import UserSettings from "./pages/UserSettings";
 import Quizzes from "./pages/Quizzes";
+import Overview from './pages/Overview';
+import Edit from './pages/Edit';
+import Create from './pages/Create';
 import HostPage from "./pages/HostPage";
 import QuizPage from "./pages/QuizPage";
 import EnterQuiz from "./pages/EnterQuiz";
@@ -30,6 +33,9 @@ function App() {
       <Route path="/quizzes" component={Quizzes} />
       <Route path="/host/:roomCode" component={HostPage} />
       <Route path="/play/:roomCode" component={QuizPage} />
+      <Route path="/quizzes/:quizId/overview" component={Overview} />
+      <Route path="/quizzes/:quizId/edit" component={Edit} />
+      <Route path="/quizzes/create" component={Create} />
       <ToastContainer theme="dark" />
     </div>
   );

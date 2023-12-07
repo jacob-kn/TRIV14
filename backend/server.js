@@ -13,7 +13,9 @@ import setupSocket from './socket/index.js';
 
 const port = process.env.PORT || 5000;
 
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 const app = express();
 app.use(express.json());
@@ -38,4 +40,8 @@ const io = new SocketIOServer(server, {
 });
 setupSocket(io);
 
-server.listen(port, () => console.log(`Server started on port ${port}`));
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(port, () => console.log(`Server started on port ${port}`));
+}
+
+export default app;

@@ -8,7 +8,7 @@ import User from '../models/userModel.js';
  * @access public
  */
 const getQuizzes = asyncHandler(async (req, res) => {
-  const page = req.query.page || 1;
+  const page = req.query.page !== undefined ? req.query.page : 1;
   const sort = req.query.sort || '-createdAt';
   const filter = req.query.filter || '';
 
