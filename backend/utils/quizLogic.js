@@ -6,6 +6,11 @@ function startQuiz(io, quiz, roomCode, duration, hostId) {
     let scores = {};
 
     function nextQuestion() {
+        io.to(roomCode).sockets.forEach((socket) => {
+            if(!scores[socket.id]){
+                scores[socket.id] = 0 // Setting initial scores to 0
+            }
+        });
         currentQuestion++;
 
         if (currentQuestion < quiz.questions.length) {
@@ -53,8 +58,6 @@ function handleAnswer(io, socketId, submittedAnswer, roomCode) {
 function handleNextQuestion(io, socketId, roomCode) {
     const session = quizSessions.get(roomCode);
     if (session && session.hostId === socketId) { // verfying its the host doing this event
-        console.log("handling next question");
-        session.nextQuestion();
 
         const participantScores = session.scores;
         console.log(participantScores);
@@ -63,8 +66,10 @@ function handleNextQuestion(io, socketId, roomCode) {
         for (let id in participantScores) {
             console.log("emiting update score (backend");
             const score = participantScores[id];
-            io.to(participantSocketId).emit('updateScore', score);
+            io.to(id).emit('updateScore', score);
         }
+
+        session.nextQuestion();
     }
 }
 
