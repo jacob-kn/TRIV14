@@ -1,0 +1,48 @@
+services:
+  frontend:
+    build:
+      context: frontend
+    container_name: triv14-frontend-container
+    ports:
+      - 3000:3000
+    stdin_open: true
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    networks:
+      - react-express
+    depends_on:
+      - backend
+
+  backend:
+    restart: always
+    build:
+      context: backend
+    container_name: triv14-backend-container
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - express-mongo
+      - react-express
+    ports:
+      - 5000:5000
+    env_file:
+      - ./.env
+
+  mongo:
+    restart: always
+    image: mongo:6
+    container_name: triv14-db-container
+    volumes:
+      - ./data:/data/db
+    networks:
+      - express-mongo
+    expose:
+      - 27017
+networks:
+  react-express:
+  express-mongo:
