@@ -2,14 +2,15 @@ import BgFlourish from "../components/BgFlourish";
 import RunnerUp from "../components/RunnerUp";
 
 export default function WinnerPage({ scores }) {
-  const mapArray = Array.from(scores.entries());
-  mapArray.sort((a, b) => b[1] - a[1]);
-  const sortedMap = new Map(mapArray);
+  // let mapObject = new Map(JSON.parse(scores));
+  // const mapArray = Array.from(mapObject.entries());
+  // mapArray.sort((a, b) => b[1] - a[1]);
+  // const sortedMap = new Map(mapArray);
 
-  const valuesIterator = sortedMap.values();
-  const first = valuesIterator.next().value;
-  const second = valuesIterator.next().value;
-  const third = valuesIterator.next().value;
+  // const valuesIterator = sortedMap.values();
+  // const first = valuesIterator.next().value;
+  // const second = valuesIterator.next().value;
+  // const third = valuesIterator.next().value;
 
   return (
     <div className="min-h-fit pb-20 flex justify-center text-white">
